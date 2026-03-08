@@ -1,98 +1,110 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-/// <summary>
-/// Synchronise le footer avec la page affichée : highlight du bouton actif et navigation au clic.
-/// À attacher sur chaque Footer (un par page) ou sur un objet qui contient les 3 boutons.
-/// </summary>
 public class HomePagerFooterNav : MonoBehaviour
 {
-    [Header("Pager")]
     [SerializeField] private HomePagerSnap pager;
-
-    [Header("Boutons (ordre: Doc, Progression, Collection)")]
     [SerializeField] private Button[] pageButtons = new Button[3];
-
-    [Header("Highlight (optionnel)")]
-    [SerializeField] private Image[] buttonBackgrounds;
-    [SerializeField] private Color normalColor = new Color(0.22f, 0.25f, 0.3f, 0.9f);
-    [SerializeField] private Color highlightColor = new Color(0.35f, 0.5f, 0.6f, 1f);
-
-    [Header("Labels (optionnel, sinon utilisés par défaut)")]
-    [SerializeField] private string[] labelTexts = new[]
-    {
-        "Documentation",
-        "Progression",
-        "Collection"
-    };
+    [SerializeField] private Color normalColor = new Color(0.03f, 0.06f, 0.1f, 0.98f);
+    [SerializeField] private Color highlightColor = new Color(0.22f, 0.45f, 0.66f, 1f);
 
     private void Awake()
     {
-        if (!pager)
-            pager = FindFirstObjectByType<HomePagerSnap>();
+        ResolveReferences();
+        RefreshHighlight();
     }
 
     private void OnEnable()
     {
+        ResolveReferences();
         if (pager != null)
-            pager.OnPageChanged += RefreshHighlight;
-
-        for (int i = 0; i < pageButtons.Length && i < 3; i++)
-        {
-            int index = i;
-            if (pageButtons[i] != null)
-            {
-                pageButtons[i].onClick.RemoveAllListeners();
-                pageButtons[i].onClick.AddListener(() => GoToPage(index));
-            }
-        }
-
-        ApplyLabels();
-        RefreshHighlight(pager != null ? pager.CurrentPage : 0);
+            pager.OnPageChanged += OnPageChanged;
+        RefreshHighlight();
     }
 
     private void OnDisable()
     {
         if (pager != null)
-            pager.OnPageChanged -= RefreshHighlight;
+            pager.OnPageChanged -= OnPageChanged;
     }
 
-    private void ApplyLabels()
+    public void GoDoc()
     {
-        for (int i = 0; i < pageButtons.Length && i < labelTexts.Length; i++)
-        {
-            if (pageButtons[i] == null) continue;
-            var tmp = pageButtons[i].GetComponentInChildren<TMP_Text>(true);
-            if (tmp != null && !string.IsNullOrEmpty(labelTexts[i]))
-                tmp.text = labelTexts[i];
-        }
+        GoToPage(0);
     }
 
-    private void RefreshHighlight(int currentPage)
+    public void GoProgression()
     {
-        if (buttonBackgrounds != null && buttonBackgrounds.Length >= 3)
+        GoToPage(1);
+    }
+
+    public void GoCollection()
+    {
+        GoToPage(2);
+    }
+
+    public void GoToPage(int pageIndex)
+    {
+        ResolveReferences();
+        if (pager == null)
+            return;
+
+        pager.SnapToPage(pageIndex);
+        RefreshHighlight();
+    }
+
+    private void OnPageChanged(int _)
+    {
+        RefreshHighlight();
+    }
+
+    private void ResolveReferences()
+    {
+        if (pager == null)
+            pager = FindFirstObjectByType<HomePagerSnap>();
+
+        bool needsButtons = pageButtons == null || pageButtons.Length < 3;
+        if (!needsButtons)
         {
             for (int i = 0; i < 3; i++)
             {
-                if (buttonBackgrounds[i] != null)
-                    buttonBackgrounds[i].color = (i == currentPage) ? highlightColor : normalColor;
+                if (pageButtons[i] == null)
+                {
+                    needsButtons = true;
+                    break;
+                }
             }
-            return;
         }
 
-        for (int i = 0; i < pageButtons.Length && i < 3; i++)
-        {
-            if (pageButtons[i] == null) continue;
-            var img = pageButtons[i].targetGraphic as Image;
-            if (img != null)
-                img.color = (i == currentPage) ? highlightColor : normalColor;
-        }
+        if (!needsButtons)
+            return;
+
+        Transform footerRow = transform.Find("FooterRow");
+        if (footerRow == null)
+            return;
+
+        pageButtons = new Button[3];
+        pageButtons[0] = footerRow.Find("BtnDoc")?.GetComponent<Button>();
+        pageButtons[1] = footerRow.Find("BtnProgression")?.GetComponent<Button>();
+        pageButtons[2] = footerRow.Find("BtnCollection")?.GetComponent<Button>();
     }
 
-    private void GoToPage(int pageIndex)
+    private void RefreshHighlight()
     {
-        if (pager != null)
-            pager.SnapToPage(pageIndex);
+        int currentPage = pager != null ? pager.CurrentPage : 1;
+
+        if (pageButtons == null)
+            return;
+
+        for (int i = 0; i < pageButtons.Length; i++)
+        {
+            Button button = pageButtons[i];
+            if (button == null)
+                continue;
+
+            Image image = button.GetComponent<Image>();
+            if (image != null)
+                image.color = i == currentPage ? highlightColor : normalColor;
+        }
     }
 }

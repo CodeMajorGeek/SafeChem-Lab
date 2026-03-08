@@ -11,16 +11,16 @@ public class HomePagerSnap : MonoBehaviour, IBeginDragHandler, IEndDragHandler
 
     [Header("Settings")]
     [SerializeField] private int pageCount = 3;
-    [SerializeField] private int startPage = 1;          // 0=gauche,1=centre,2=droite
-    [SerializeField] private float snapDuration = 0.20f; // animation
-    [SerializeField] private float swipeThreshold = 0.12f; // 0..1 normalized
+    [SerializeField] private int startPage = 0; // 0=left, 1=center, 2=right
+    [SerializeField] private float snapDuration = 0.35f;
+    [Tooltip("Snap back duration when returning to the same page.")]
+    [SerializeField] private float snapBackDuration = 0.4f;
 
     public int CurrentPage { get; private set; }
 
-    /// <summary>Invoqué quand la page affichée change (index 0, 1 ou 2).</summary>
+    /// <summary>Raised when visible page changes (index 0, 1 or 2).</summary>
     public event Action<int> OnPageChanged;
 
-    private float dragStartPos;
     private Coroutine snapCo;
 
     private void Reset()
@@ -31,6 +31,8 @@ public class HomePagerSnap : MonoBehaviour, IBeginDragHandler, IEndDragHandler
     private void Awake()
     {
         if (!scrollRect) scrollRect = GetComponent<ScrollRect>();
+        if (scrollRect)
+            scrollRect.inertia = false;
         CurrentPage = Mathf.Clamp(startPage, 0, pageCount - 1);
     }
 
@@ -39,67 +41,115 @@ public class HomePagerSnap : MonoBehaviour, IBeginDragHandler, IEndDragHandler
         JumpToPage(CurrentPage);
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    private void OnDisable()
     {
-        dragStartPos = scrollRect.horizontalNormalizedPosition;
+        if (snapCo != null)
+        {
+            StopCoroutine(snapCo);
+            snapCo = null;
+        }
     }
+
+    public void OnBeginDrag(PointerEventData eventData) { }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        float endPos = scrollRect.horizontalNormalizedPosition;
-        float delta = endPos - dragStartPos;
+        if (!this || scrollRect == null) return;
 
-        int target = CurrentPage;
-
-        if (Mathf.Abs(delta) > swipeThreshold)
-            target += (delta > 0f) ? 1 : -1;
-        else
-            target = Mathf.RoundToInt(endPos * (pageCount - 1));
-
+        float pos = scrollRect.horizontalNormalizedPosition;
+        int target = pageCount <= 1 ? 0 : Mathf.RoundToInt(pos * (pageCount - 1));
         target = Mathf.Clamp(target, 0, pageCount - 1);
         SnapToPage(target);
     }
 
     public void SnapToPage(int pageIndex)
     {
+        if (!this || scrollRect == null) return;
+
         pageIndex = Mathf.Clamp(pageIndex, 0, pageCount - 1);
-        if (CurrentPage == pageIndex)
-            return;
+        bool samePage = (CurrentPage == pageIndex);
         CurrentPage = pageIndex;
         OnPageChanged?.Invoke(CurrentPage);
 
-        float target = (pageCount <= 1) ? 0f : pageIndex / (float)(pageCount - 1);
-
+        float target = GetNormalizedTarget(pageIndex);
         if (snapCo != null)
             StopCoroutine(snapCo);
 
-        snapCo = StartCoroutine(AnimateTo(target, snapDuration));
+        float duration = samePage ? snapBackDuration : snapDuration;
+        snapCo = StartCoroutine(AnimateTo(pageIndex, target, duration));
     }
 
     public void JumpToPage(int pageIndex)
     {
+        if (!this || scrollRect == null) return;
+
         pageIndex = Mathf.Clamp(pageIndex, 0, pageCount - 1);
         CurrentPage = pageIndex;
         OnPageChanged?.Invoke(CurrentPage);
 
-        float target = (pageCount <= 1) ? 0f : pageIndex / (float)(pageCount - 1);
-        scrollRect.horizontalNormalizedPosition = target;
+        float target = GetNormalizedTarget(pageIndex);
+        ApplyPagePosition(pageIndex, target);
     }
 
-    private IEnumerator AnimateTo(float target, float duration)
+    private IEnumerator AnimateTo(int pageIndex, float target, float duration)
     {
+        if (!this || scrollRect == null) yield break;
+
         float start = scrollRect.horizontalNormalizedPosition;
+        float startContentX = scrollRect.content != null ? scrollRect.content.anchoredPosition.x : 0f;
+        float targetContentX = GetContentTargetX(pageIndex);
         float t = 0f;
 
         while (t < duration)
         {
+            if (!this || scrollRect == null) yield break;
+
             t += Time.unscaledDeltaTime;
-            float k = Mathf.SmoothStep(0f, 1f, t / duration);
+            float x = Mathf.Clamp01(t / duration);
+            float k = EaseInOutCubic(x);
             scrollRect.horizontalNormalizedPosition = Mathf.Lerp(start, target, k);
+            if (scrollRect.content != null)
+            {
+                Vector2 pos = scrollRect.content.anchoredPosition;
+                pos.x = Mathf.Lerp(startContentX, targetContentX, k);
+                scrollRect.content.anchoredPosition = pos;
+            }
             yield return null;
         }
 
-        scrollRect.horizontalNormalizedPosition = target;
+        if (!this || scrollRect == null) yield break;
+
+        ApplyPagePosition(pageIndex, target);
         snapCo = null;
+    }
+
+    private float GetNormalizedTarget(int pageIndex)
+    {
+        return pageCount <= 1 ? 0f : pageIndex / (float)(pageCount - 1);
+    }
+
+    private void ApplyPagePosition(int pageIndex, float normalizedTarget)
+    {
+        scrollRect.horizontalNormalizedPosition = normalizedTarget;
+        if (scrollRect.content != null)
+        {
+            Vector2 pos = scrollRect.content.anchoredPosition;
+            pos.x = GetContentTargetX(pageIndex);
+            scrollRect.content.anchoredPosition = pos;
+        }
+    }
+
+    private float GetContentTargetX(int pageIndex)
+    {
+        if (scrollRect == null || scrollRect.viewport == null)
+            return 0f;
+
+        float pageWidth = scrollRect.viewport.rect.width;
+        return -pageIndex * pageWidth;
+    }
+
+    private static float EaseInOutCubic(float t)
+    {
+        return t < 0.5f ? 4f * t * t * t : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
     }
 }
