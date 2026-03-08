@@ -3199,6 +3199,7 @@ GameObject:
   - component: {fileID: 1332810006}
   - component: {fileID: 1332810005}
   - component: {fileID: 1332810004}
+  - component: {fileID: 1332810007}
   m_Layer: 5
   m_Name: Body
   m_TagString: Untagged
@@ -3245,6 +3246,23 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: 1
   m_LayoutPriority: 1
+--- !u!114 &1332810007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332810002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b3f1c5b7e0a42afaf4f2b33d14f8a61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HomeDocumentationPanel
+  resourcesFolder: documentation-datas
+  panelColor: {r: 0.03, g: 0.06, b: 0.1, a: 0.88}
+  cardColor: {r: 0.08, g: 0.12, b: 0.18, a: 0.94}
+  buttonColor: {r: 0.1, g: 0.16, b: 0.24, a: 0.96}
+  selectedButtonColor: {r: 0.22, g: 0.45, b: 0.66, a: 1}
 --- !u!114 &1332810005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3768,7 +3786,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fixOnStart: 1
-  headerHeight: 248
+  headerHeight: 210
   footerHeight: 184
   settingsWidthRatio: 0.5
   settingsAnimDuration: 0.25

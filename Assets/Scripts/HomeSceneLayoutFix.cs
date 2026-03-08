@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class HomeSceneLayoutFix : MonoBehaviour
 {
     [SerializeField] private bool fixOnStart = true;
-    [SerializeField] private float headerHeight = 496f;
+    [SerializeField] private float headerHeight = 210f;
     [SerializeField] private float footerHeight = 184f;
     [SerializeField] private float settingsWidthRatio = 0.5f;
     [SerializeField] private float settingsAnimDuration = 0.25f;
@@ -35,11 +35,20 @@ public class HomeSceneLayoutFix : MonoBehaviour
     private void Start()
     {
         if (!fixOnStart) return;
+        RuntimeFileLogger.Log("HomeSceneLayoutFix", "Start fixOnStart=true headerHeight=" + headerHeight + " footerHeight=" + footerHeight);
         _scroll = FindFirstObjectByType<ScrollRect>();
         Canvas canvas = FindFirstObjectByType<Canvas>();
-        if (_scroll == null || canvas == null) return;
+        if (_scroll == null || canvas == null)
+        {
+            RuntimeFileLogger.Error("HomeSceneLayoutFix", "Missing ScrollRect or Canvas");
+            return;
+        }
         _canvasRt = canvas.GetComponent<RectTransform>();
-        if (_canvasRt == null) return;
+        if (_canvasRt == null)
+        {
+            RuntimeFileLogger.Error("HomeSceneLayoutFix", "Canvas RectTransform missing");
+            return;
+        }
         _chrome = _canvasRt;
         NormalizeFixedBackground();
         NormalizePagerSurfaces();
@@ -81,6 +90,7 @@ public class HomeSceneLayoutFix : MonoBehaviour
             pagerRt.anchorMax = Vector2.one;
             pagerRt.offsetMin = new Vector2(0f, footerHeight);
             pagerRt.offsetMax = new Vector2(0f, -headerHeight);
+            RuntimeFileLogger.Log("HomeSceneLayoutFix", "Pager offsets min=" + pagerRt.offsetMin + " max=" + pagerRt.offsetMax);
         }
 
         RectTransform viewport = _scroll.viewport;
@@ -107,9 +117,10 @@ public class HomeSceneLayoutFix : MonoBehaviour
         header.pivot = new Vector2(0.5f, 1f);
         header.anchoredPosition = Vector2.zero;
         header.sizeDelta = new Vector2(0f, headerHeight);
+        RuntimeFileLogger.Log("HomeSceneLayoutFix", "NormalizeHeader height=" + headerHeight);
 
         Image bg = EnsureImage(header);
-        bg.color = new Color(0.03f, 0.06f, 0.1f, 0.98f);
+        bg.color = new Color(0.05f, 0.09f, 0.16f, 1f);
 
         Image tex = EnsureImage(EnsureRect(header, "HeaderTexture"));
         RectTransform texRt = tex.rectTransform;
@@ -118,7 +129,7 @@ public class HomeSceneLayoutFix : MonoBehaviour
         texRt.offsetMin = Vector2.zero;
         texRt.offsetMax = Vector2.zero;
         tex.sprite = LoadSprite("Backgrounds/bg-menus-4");
-        tex.color = new Color(0.2f, 0.24f, 0.32f, 0.35f);
+        tex.color = new Color(0.12f, 0.18f, 0.28f, 0.18f);
         tex.raycastTarget = false;
         texRt.SetAsFirstSibling();
 
@@ -127,11 +138,12 @@ public class HomeSceneLayoutFix : MonoBehaviour
         if (logo != null)
         {
             RectTransform logoRt = EnsureRect(header, "Logo");
-            logoRt.anchorMin = logoRt.anchorMax = logoRt.pivot = new Vector2(0.5f, 0.5f);
-            logoRt.anchoredPosition = new Vector2(0f, -56f);
-            float targetHeight = headerHeight * 1.35f;
+            logoRt.anchorMin = logoRt.anchorMax = new Vector2(0.5f, 1f);
+            logoRt.pivot = new Vector2(0.5f, 1f);
+            logoRt.anchoredPosition = new Vector2(0f, -15f);
+            float targetHeight = Mathf.Min(headerHeight - 18f, _canvasRt.rect.height * 0.16f);
             float aspect = logo.rect.height > 0f ? logo.rect.width / logo.rect.height : 3f;
-            logoRt.sizeDelta = new Vector2(Mathf.Min(_canvasRt.rect.width * 0.94f, targetHeight * aspect), targetHeight);
+            logoRt.sizeDelta = new Vector2(Mathf.Min(_canvasRt.rect.width * 0.68f, targetHeight * aspect), targetHeight);
             Image logoImage = EnsureImage(logoRt);
             logoImage.sprite = logo;
             logoImage.color = Color.white;
@@ -143,8 +155,8 @@ public class HomeSceneLayoutFix : MonoBehaviour
         RectTransform settingsRt = EnsureRect(header, "BtnSettings");
         settingsRt.anchorMin = settingsRt.anchorMax = new Vector2(0f, 0.5f);
         settingsRt.pivot = new Vector2(0f, 0.5f);
-        settingsRt.anchoredPosition = new Vector2(32f, -56f);
-        settingsRt.sizeDelta = new Vector2(232f, 232f);
+        settingsRt.anchoredPosition = new Vector2(24f, -18f);
+        settingsRt.sizeDelta = new Vector2(184f, 184f);
         Image settingsImage = EnsureImage(settingsRt);
         settingsImage.sprite = LoadSprite("Icons/param");
         settingsImage.color = Color.white;
@@ -254,14 +266,22 @@ public class HomeSceneLayoutFix : MonoBehaviour
         _settings.sizeDelta = new Vector2(GetSettingsWidth(), 0f);
         _settings.anchoredPosition = new Vector2(-GetSettingsWidth(), 0f);
         Image bg = EnsureImage(_settings); bg.color = new Color(0.04f, 0.07f, 0.12f, 0.98f);
+        ClearChildren(_settings);
         VerticalLayoutGroup v = _settings.GetComponent<VerticalLayoutGroup>(); if (v == null) v = _settings.gameObject.AddComponent<VerticalLayoutGroup>();
-        v.padding = new RectOffset(16, 16, Mathf.RoundToInt(headerHeight + 16), 16); v.spacing = 10; v.childControlWidth = true; v.childControlHeight = false; v.childForceExpandWidth = true;
+        v.padding = new RectOffset(20, 20, 88, 20); v.spacing = 14; v.childAlignment = TextAnchor.UpperLeft; v.childControlWidth = true; v.childControlHeight = false; v.childForceExpandWidth = true; v.childForceExpandHeight = false;
 
-        EnsureLabel(_settings, "Parametres", 28, FontStyle.Bold);
-        EnsureLabel(_settings, "Pseudo", 18, FontStyle.Normal);
+        RectTransform titleRt = EnsureRect(_settings, "SettingsTitle");
+        LayoutElement titleLe = titleRt.GetComponent<LayoutElement>(); if (titleLe == null) titleLe = titleRt.gameObject.AddComponent<LayoutElement>(); titleLe.preferredHeight = 42;
+        Text title = EnsureLabel(titleRt, "Parametres", 28, FontStyle.Bold); title.alignment = TextAnchor.MiddleLeft; title.horizontalOverflow = HorizontalWrapMode.Overflow; title.verticalOverflow = VerticalWrapMode.Truncate;
+        RectTransform titleTextRt = title.rectTransform; titleTextRt.anchorMin = Vector2.zero; titleTextRt.anchorMax = Vector2.one; titleTextRt.offsetMin = Vector2.zero; titleTextRt.offsetMax = Vector2.zero;
+
+        RectTransform pseudoLabelRt = EnsureRect(_settings, "PseudoLabel");
+        LayoutElement pseudoLe = pseudoLabelRt.GetComponent<LayoutElement>(); if (pseudoLe == null) pseudoLe = pseudoLabelRt.gameObject.AddComponent<LayoutElement>(); pseudoLe.preferredHeight = 28;
+        Text pseudoLabel = EnsureLabel(pseudoLabelRt, "Pseudo :", 22, FontStyle.Bold); pseudoLabel.alignment = TextAnchor.MiddleLeft; pseudoLabel.horizontalOverflow = HorizontalWrapMode.Overflow; pseudoLabel.verticalOverflow = VerticalWrapMode.Truncate;
+        RectTransform pseudoTextRt = pseudoLabel.rectTransform; pseudoTextRt.anchorMin = Vector2.zero; pseudoTextRt.anchorMax = Vector2.one; pseudoTextRt.offsetMin = Vector2.zero; pseudoTextRt.offsetMax = Vector2.zero;
 
         RectTransform inputRt = EnsureRect(_settings, "PseudoInput");
-        LayoutElement le = inputRt.GetComponent<LayoutElement>(); if (le == null) le = inputRt.gameObject.AddComponent<LayoutElement>(); le.preferredHeight = 44;
+        LayoutElement le = inputRt.GetComponent<LayoutElement>(); if (le == null) le = inputRt.gameObject.AddComponent<LayoutElement>(); le.preferredHeight = 58;
         Image ibg = EnsureImage(inputRt); ibg.color = new Color(0.12f, 0.16f, 0.22f, 1);
         _pseudoInput = inputRt.GetComponent<InputField>(); if (_pseudoInput == null) _pseudoInput = inputRt.gameObject.AddComponent<InputField>();
 
@@ -271,6 +291,8 @@ public class HomeSceneLayoutFix : MonoBehaviour
         _pseudoInput.onEndEdit.RemoveAllListeners(); _pseudoInput.onEndEdit.AddListener(SavePseudo);
 
         Button save = EnsureMenuButton(_settings, "BtnSave", "Enregistrer", new Color(0.16f, 0.36f, 0.64f, 1));
+        LayoutElement saveLe = save.GetComponent<LayoutElement>(); if (saveLe != null) saveLe.preferredHeight = 56;
+        Text saveText = save.GetComponentInChildren<Text>(); if (saveText != null) saveText.fontSize = 20;
         save.onClick.RemoveAllListeners(); save.onClick.AddListener(() => SavePseudo(_pseudoInput != null ? _pseudoInput.text : string.Empty));
     }
 
@@ -452,8 +474,13 @@ public class HomeSceneLayoutFix : MonoBehaviour
             Button b = EnsureButton(btnRt); b.targetGraphic = bi; b.onClick.RemoveAllListeners();
             int index = i + 1;
             b.onClick.AddListener(() => { PlayerPrefs.SetInt(SelectedLevelKey, index); PlayerPrefs.Save(); if (_play != null) { _play.gameObject.SetActive(true); Text t = _play.GetComponentInChildren<Text>(true); if (t != null) t.text = "Jouer niveau " + index; } });
-            Text cap = EnsureLabel(btnRt, "Niveau " + index, 28, FontStyle.Bold); cap.alignment = TextAnchor.MiddleCenter;
-            RectTransform crt = cap.rectTransform; crt.anchorMin = Vector2.zero; crt.anchorMax = Vector2.one; crt.offsetMin = Vector2.zero; crt.offsetMax = Vector2.zero;
+            Text cap = EnsureLabel(btnRt, "Niveau " + index, 32, FontStyle.Bold);
+            cap.alignment = TextAnchor.LowerCenter;
+            RectTransform crt = cap.rectTransform;
+            crt.anchorMin = Vector2.zero;
+            crt.anchorMax = Vector2.one;
+            crt.offsetMin = new Vector2(0f, -14f);
+            crt.offsetMax = new Vector2(0f, 12f);
         }
 
         _play = EnsureMenuButton(_progressBody, "BtnPlayLevel", "Jouer", new Color(0.1f, 0.42f, 0.76f, 1));
@@ -495,6 +522,12 @@ public class HomeSceneLayoutFix : MonoBehaviour
             Destroy(component);
     }
 
+    private static void ClearChildren(Transform parent)
+    {
+        for (int i = parent.childCount - 1; i >= 0; i--)
+            Destroy(parent.GetChild(i).gameObject);
+    }
+
     private static Button EnsureButton(RectTransform rt)
     {
         Button b = rt.GetComponent<Button>(); if (b == null) b = rt.gameObject.AddComponent<Button>(); return b;
@@ -504,7 +537,7 @@ public class HomeSceneLayoutFix : MonoBehaviour
     {
         RectTransform rt = EnsureRect(parent, "Label");
         Text t = rt.GetComponent<Text>(); if (t == null) t = rt.gameObject.AddComponent<Text>();
-        t.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); t.fontSize = size; t.fontStyle = style; t.color = Color.white; t.text = value; t.raycastTarget = false;
+        t.font = UiFontProvider.GetDefaultFont(); t.fontSize = size; t.fontStyle = style; t.color = Color.white; t.text = value; t.raycastTarget = false;
         return t;
     }
 
@@ -512,7 +545,7 @@ public class HomeSceneLayoutFix : MonoBehaviour
     {
         RectTransform rt = EnsureRect(parent, name); rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = new Vector2(12, 6); rt.offsetMax = new Vector2(-12, -6);
         Text t = rt.GetComponent<Text>(); if (t == null) t = rt.gameObject.AddComponent<Text>();
-        t.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); t.fontSize = 20; t.fontStyle = style; t.color = color; t.alignment = TextAnchor.MiddleLeft; t.text = value;
+        t.font = UiFontProvider.GetDefaultFont(); t.fontSize = 20; t.fontStyle = style; t.color = color; t.alignment = TextAnchor.MiddleLeft; t.text = value;
         return t;
     }
 

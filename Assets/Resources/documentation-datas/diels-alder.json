@@ -1,0 +1,27 @@
+{
+  "id": "diels-alder",
+  "title": "Reaction de Diels-Alder",
+  "category": "Cycloaddition",
+  "shortDescription": "La reaction de Diels-Alder assemble un diene et un dienophile pour former rapidement un cycle a six atomes.",
+  "whyItMatters": "Dans le jeu, cette fiche aide a reconnaitre quand deux reactifs peuvent construire un cycle de maniere efficace sans multiplier les etapes inutiles.",
+  "sections": [
+    {
+      "heading": "Principe",
+      "body": "Le diene doit pouvoir adopter une forme favorable pour reagir avec un dienophile, souvent une molecule possedant une double liaison rendue plus reactive par des groupes attracteurs d'electrons."
+    },
+    {
+      "heading": "Ce qu'il faut verifier",
+      "body": "Cherche un diene conjugue et un partenaire insature compatible. Si la molecule cible contient un cycle a six membres avec une nouvelle double liaison, pense a Diels-Alder."
+    },
+    {
+      "heading": "Indice pratique",
+      "body": "Si l'objectif est de former un cycle en une seule etape propre, cette reaction est souvent une bonne piste. Elle demande surtout de choisir les bons reactifs de depart."
+    }
+  ],
+  "keywords": [
+    "diene",
+    "dienophile",
+    "cycle a 6",
+    "synthese rapide"
+  ]
+}

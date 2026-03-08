@@ -1,0 +1,27 @@
+{
+  "id": "double-displacement",
+  "title": "Double displacement",
+  "category": "Echange d'ions",
+  "shortDescription": "Une reaction de double displacement echange les partenaires entre deux composes ioniques. Elle est frequente en solution aqueuse.",
+  "whyItMatters": "Dans le jeu, cette fiche aide a reconnaitre une reaction simple de melange quand on cherche un precipite, un gaz, ou un produit ionique plus stable.",
+  "sections": [
+    {
+      "heading": "Principe",
+      "body": "Deux composes echangeant leurs ions peuvent former deux nouveaux produits. La reaction est surtout utile si un produit precipite, degage un gaz ou forme un compose faible."
+    },
+    {
+      "heading": "Ce qu'il faut verifier",
+      "body": "Observe la nature des ions presents et demande-toi si un solide insoluble peut apparaitre. Si rien ne change en solution, la reaction peut etre peu utile."
+    },
+    {
+      "heading": "Indice pratique",
+      "body": "Quand un niveau demande de separer ou neutraliser des especes ioniques par simple melange controle, pense a ce type de reaction avant des procedes plus complexes."
+    }
+  ],
+  "keywords": [
+    "ions",
+    "precipite",
+    "solution",
+    "echange"
+  ]
+}

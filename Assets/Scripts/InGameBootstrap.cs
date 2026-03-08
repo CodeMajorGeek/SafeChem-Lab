@@ -186,7 +186,7 @@ public static class InGameBootstrap
         rt.sizeDelta = sz;
 
         Text txt = go.AddComponent<Text>();
-        txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        txt.font = UiFontProvider.GetDefaultFont();
         txt.text = value;
         txt.fontSize = size;
         txt.fontStyle = style;
