@@ -1,0 +1,20 @@
+{
+  "id": "h2so4",
+  "displayName": "H2SO4",
+  "formula": "H2SO4",
+  "shortDescription": "Acide sulfurique, acide fort très utilisé en synthèse, analyse et procédés industriels.",
+  "hazardSummary": "Très corrosif, provoque brûlures graves, réaction fortement exothermique avec l'eau et substances organiques.",
+  "handlingNotes": "Toujours verser lentement l'acide dans l'eau, porter gants, lunettes et blouse, manipuler sous hotte.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 3,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "acide fort",
+    "déshydratant",
+    "corrosif"
+  ]
+}

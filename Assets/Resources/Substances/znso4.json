@@ -1,0 +1,20 @@
+{
+  "id": "znso4",
+  "displayName": "ZnSO4",
+  "formula": "ZnSO4",
+  "shortDescription": "Sulfate de zinc, sel inorganique soluble utilisé en chimie, traitement de surface et agriculture.",
+  "hazardSummary": "Irritant pour les yeux et la peau, nocif pour les organismes aquatiques selon concentration.",
+  "handlingNotes": "Éviter rejets dans l'environnement, porter gants et lunettes, manipuler en zone ventilée.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 9,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "sulfate",
+    "zinc",
+    "sel"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "level-0",
+  "levelIndex": 0,
+  "title": "Niveau 0",
+  "summary": "Prise en main du laboratoire et des cartes de base.",
+  "objective": "Rassembler les bons réactifs puis valider une transformation simple.",
+  "hseFocus": "Identifier au moins un pictogramme danger avant de lancer la simulation.",
+  "sceneName": "InGame"
+}

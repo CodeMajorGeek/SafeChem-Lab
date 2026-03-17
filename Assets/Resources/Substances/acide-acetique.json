@@ -1,0 +1,20 @@
+{
+  "id": "acide-acetique",
+  "displayName": "Acide acétique",
+  "formula": "C2H4O2",
+  "shortDescription": "Acide organique courant utilisé en synthèse chimique, régulation de pH et préparation de solutions tampons.",
+  "hazardSummary": "Corrosif à forte concentration, provoque brûlures cutanées et lésions oculaires graves, vapeurs irritantes.",
+  "handlingNotes": "Porter gants, lunettes et blouse, manipuler sous hotte ou en zone ventilée, éviter inhalation et projections.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 1,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "acide",
+    "organique",
+    "corrosif"
+  ]
+}

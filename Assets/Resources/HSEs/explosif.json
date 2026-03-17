@@ -1,0 +1,19 @@
+{
+  "id": "explosif",
+  "title": "Explosif",
+  "subtitle": "Danger HSE",
+  "shortDescription": "Matière pouvant exploser sous l'effet d'un choc, frottement, chaleur ou flamme.",
+  "detailedDescription": "Certaines substances peuvent réagir violemment avec dégagement brutal de gaz et d'énergie. Stockage et manipulation strictement contrôlés, éviter toute contrainte mécanique.",
+  "safetyNotes": "Travailler en très petites quantités, utiliser protections adaptées et maintenir à distance de toute source d'ignition.",
+  "atlasTextureResource": "HSEs/HSE-2",
+  "atlasX": 159,
+  "atlasY": 0,
+  "atlasWidth": 159,
+  "atlasHeight": 156,
+  "imageResource": "HSEs/HSE-2",
+  "tags": [
+    "explosif",
+    "hse",
+    "instable"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "esterification-fischer",
+  "title": "Estérification de Fischer",
+  "category": "Estérification",
+  "shortDescription": "Une estérification de Fischer forme un ester à partir d'un acide carboxylique et d'un alcool, en présence d'un catalyseur acide.",
+  "whyItMatters": "Dans le jeu, cette fiche aide à identifier les situations où l'on doit produire une odeur, un solvant ou un composé organique stable à partir d'un acide et d'un alcool.",
+  "sections": [
+    {
+      "heading": "Principe",
+      "body": "On fait réagir un acide carboxylique avec un alcool sous catalyse acide. La réaction produit un ester et de l'eau. Elle est réversible, donc l'équilibre compte."
+    },
+    {
+      "heading": "Ce qu'il faut vérifier",
+      "body": "Repère un couple acide + alcool compatible. Pour favoriser l'ester, on peut chauffer doucement et limiter l'eau dans le milieu réactionnel."
+    },
+    {
+      "heading": "Indice pratique",
+      "body": "Si l'objectif est de transformer une fonction acide en produit organique moins polaire, pense à l'estérification de Fischer avant des voies plus complexes."
+    }
+  ],
+  "keywords": [
+    "ester",
+    "acide carboxylique",
+    "alcool",
+    "équilibre"
+  ]
+}

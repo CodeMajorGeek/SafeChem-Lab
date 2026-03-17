@@ -1,0 +1,20 @@
+{
+  "id": "acetate-ethyl",
+  "displayName": "Acétate d'éthyl",
+  "formula": "C4H8O2",
+  "shortDescription": "Solvant organique volatil couramment utilisé en laboratoire, en extraction, en chromatographie et en formulation industrielle.",
+  "hazardSummary": "Liquide et vapeurs très inflammables, peut provoquer somnolence, vertiges et irritation des yeux et des voies respiratoires.",
+  "handlingNotes": "Éloigner des sources d'ignition, travailler en atmosphère ventilée ou sous hotte, porter gants et lunettes, refermer rapidement le flacon après usage.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 5,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "solvant",
+    "ester",
+    "inflammable"
+  ]
+}

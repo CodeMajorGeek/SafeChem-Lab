@@ -1,0 +1,20 @@
+{
+  "id": "cuso4",
+  "displayName": "CuSO4",
+  "formula": "CuSO4",
+  "shortDescription": "Sulfate de cuivre, sel inorganique bleu utilisé en analyse chimique, synthèse et comme réactif de laboratoire.",
+  "hazardSummary": "Irritant pour la peau et les yeux, nocif en cas d'ingestion et dangereux pour les organismes aquatiques.",
+  "handlingNotes": "Porter gants et lunettes, éviter dispersion de la poudre, manipuler en zone ventilée et éliminer les déchets via une filière adaptée.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 10,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "sulfate",
+    "cuivre",
+    "aquatoxique"
+  ]
+}

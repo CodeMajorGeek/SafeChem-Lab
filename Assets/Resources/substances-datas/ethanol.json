@@ -1,0 +1,16 @@
+{
+  "id": "ethanol",
+  "displayName": "Éthanol",
+  "formula": "C2H6O",
+  "shortDescription": "Alcool organique courant, liquide incolore et volatil, utilisé comme solvant, désinfectant et carburant.",
+  "hazardSummary": "Liquide et vapeurs très inflammables. Peut irriter les yeux. L'exposition répétée peut provoquer sécheresse cutanée.",
+  "handlingNotes": "Tenir loin des flammes et étincelles. Ventiler la zone. Porter gants et lunettes. Stocker dans un récipient fermé.",
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "alcool",
+    "inflammable",
+    "solvant",
+    "C2H6O"
+  ]
+}

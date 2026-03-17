@@ -1,0 +1,9 @@
+{
+  "id": "level-3",
+  "levelIndex": 3,
+  "title": "Niveau 3",
+  "summary": "Séquence multi-étapes avec choix de documentation pertinent.",
+  "objective": "Enchaîner les étapes sans erreur de compatibilité chimique.",
+  "hseFocus": "Limiter exposition aux produits toxiques et gérer les déchets.",
+  "sceneName": "InGame"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "hno3",
+  "displayName": "HNO3",
+  "formula": "HNO3",
+  "shortDescription": "Acide nitrique, acide minéral fort et puissant agent oxydant utilisé en nitration et en analyse.",
+  "hazardSummary": "Très corrosif et oxydant puissant, peut provoquer brûlures graves et dégager des vapeurs toxiques.",
+  "handlingNotes": "Manipuler sous hotte avec gants, lunettes et blouse, éviter contact avec matières organiques et réductrices.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 7,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "acide fort",
+    "oxydant",
+    "corrosif"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "level-x",
+  "levelIndex": 1,
+  "title": "Niveau X",
+  "summary": "R\\u00e9sum\\u00e9 court du niveau",
+  "objective": "Objectif global du niveau",
+  "hseFocus": "Focus HSE du niveau",
+  "sceneName": "InGame",
+  "levelBrief": "Brief d'introduction affich\\u00e9 dans la modale d'entr\\u00e9e.",
+  "timeTargetSeconds": 180,
+  "defaultSubstanceSlotCount": 3,
+  "defaultMethodSlotCount": 1,
+  "defaultHseSlotCount": 2,
+  "substanceIds": [
+    "substance-a",
+    "substance-b",
+    "substance-c"
+  ],
+  "methodIds": [
+    "methode-a"
+  ],
+  "hseIds": [
+    "hse-a",
+    "hse-b"
+  ],
+  "steps": [
+    {
+      "stepId": "step-1",
+      "stepTitle": "\\u00c9tape 1",
+      "stepBrief": "Consigne de l'\\u00e9tape",
+      "introBrief": "Texte d'intro de l'\\u00e9tape (ou du niveau)",
+      "introObjective": "Objectif affich\\u00e9 dans la modale",
+      "introHseFocus": "Focus HSE affich\\u00e9 dans la modale",
+      "substanceSlotCount": 3,
+      "methodSlotCount": 1,
+      "hseSlotCount": 2,
+      "substancePhaseInstruction": "Phase 1 : instruction",
+      "methodPhaseInstruction": "Phase 2 : instruction",
+      "hsePhaseInstruction": "Phase 3 : instruction",
+      "validateSubstanceLabel": "Valider substances",
+      "validateMethodLabel": "Valider m\\u00e9thode",
+      "validateHseLabel": "Valider HSE",
+      "displaySubstanceIds": [
+        "substance-a",
+        "substance-b",
+        "substance-c",
+        "substance-piege"
+      ],
+      "displayMethodIds": [
+        "methode-a",
+        "methode-piege"
+      ],
+      "displayHseIds": [
+        "hse-a",
+        "hse-b",
+        "hse-piege"
+      ],
+      "expectedSubstanceIds": [
+        "substance-a",
+        "substance-b",
+        "substance-c"
+      ],
+      "expectedMethodIds": [
+        "methode-a"
+      ],
+      "expectedHseIds": [
+        "hse-a",
+        "hse-b"
+      ],
+      "trapSubstanceIds": [
+        "substance-piege"
+      ],
+      "trapMethodIds": [
+        "methode-piege"
+      ],
+      "trapHseIds": [
+        "hse-piege"
+      ]
+    }
+  ]
+}

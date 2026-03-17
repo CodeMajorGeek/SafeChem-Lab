@@ -1,0 +1,89 @@
+{
+  "id": "level-1",
+  "levelIndex": 1,
+  "title": "Niveau 1",
+  "summary": "Synth\u00e8se guid\u00e9e d'ac\u00e9tate d'\u00e9thyl \u00e0 partir d'acide ac\u00e9tique et d'\u00e9thanol.",
+  "objective": "R\u00e9aliser la synth\u00e8se d'ac\u00e9tate d'\u00e9thyl \u00e0 partir d'acide ac\u00e9tique, d'\u00e9thanol et de H2SO4, en \u00e9vitant le faux r\u00e9actif HCl.",
+  "hseFocus": "Identifier les risques corrosif, inflammable et toxique avant validation du montage.",
+  "sceneName": "InGame",
+  "levelBrief": "Synth\u00e8se d'ac\u00e9tate d'\u00e9thyl \u00e0 partir d'acide ac\u00e9tique, d'\u00e9thanol et de H2SO4.",
+  "targetProductId": "acetate-ethyl",
+  "targetProductName": "Ac\u00e9tate d'\u00e9thyl",
+  "timeTargetSeconds": 150,
+  "defaultSubstanceSlotCount": 3,
+  "defaultMethodSlotCount": 1,
+  "defaultHseSlotCount": 2,
+  "substanceIds": [
+    "acide-acetique",
+    "ethanol",
+    "h2so4",
+    "hcl"
+  ],
+  "methodIds": [
+    "becher-melangeur",
+    "reflux-froid",
+    "distillation"
+  ],
+  "hseIds": [
+    "corrosif",
+    "inflammable",
+    "toxique"
+  ],
+  "steps": [
+    {
+      "stepId": "step-1",
+      "stepTitle": "\u00c9tape 1 - Est\u00e9rification de Fischer",
+      "stepBrief": "Place les bonnes cartes dans les slots, puis valide chaque phase.",
+      "introBrief": "Tu vas r\u00e9aliser une est\u00e9rification de Fischer pour produire l'ac\u00e9tate d'\u00e9thyl.",
+      "introObjective": "Assembler les bons r\u00e9actifs, choisir la bonne m\u00e9thode, puis s\u00e9lectionner les cartes HSE adapt\u00e9es.",
+      "introHseFocus": "\u00c9vite les pi\u00e8ges et s\u00e9curise la manipulation avant validation.",
+      "substanceSlotCount": 3,
+      "methodSlotCount": 1,
+      "hseSlotCount": 2,
+      "substancePhaseInstruction": "Phase 1 : place les 3 substances utiles.",
+      "methodPhaseInstruction": "Phase 2 : place la m\u00e9thode adapt\u00e9e.",
+      "hsePhaseInstruction": "Phase 3 : place les 2 cartes HSE adapt\u00e9es.",
+      "validateSubstanceLabel": "Valider substances",
+      "validateMethodLabel": "Valider m\u00e9thode",
+      "validateHseLabel": "Valider HSE",
+      "displaySubstanceIds": [
+        "acide-acetique",
+        "ethanol",
+        "h2so4",
+        "hcl"
+      ],
+      "displayMethodIds": [
+        "becher-melangeur",
+        "reflux-froid",
+        "distillation"
+      ],
+      "displayHseIds": [
+        "corrosif",
+        "inflammable",
+        "toxique"
+      ],
+      "expectedSubstanceIds": [
+        "acide-acetique",
+        "ethanol",
+        "h2so4"
+      ],
+      "expectedMethodIds": [
+        "distillation"
+      ],
+      "expectedHseIds": [
+        "corrosif",
+        "inflammable"
+      ],
+      "trapSubstanceIds": [
+        "hcl"
+      ],
+      "trapMethodIds": [
+        "becher-melangeur",
+        "reflux-froid"
+      ],
+      "trapHseIds": [
+        "toxique"
+      ]
+    }
+  ]
+}

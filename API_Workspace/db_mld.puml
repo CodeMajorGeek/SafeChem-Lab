@@ -1,0 +1,35 @@
+@startuml
+hide circle
+skinparam linetype ortho
+
+title SafeChem API - MLD (PostgreSQL)
+
+entity "players" as players {
+  * player_uuid : varchar(64) <<PK>>
+  --
+  pseudo : varchar(120) NOT NULL
+  created_at : timestamptz NOT NULL
+  updated_at : timestamptz NOT NULL
+  deleted_at : timestamptz NULL
+}
+
+entity "level_results" as level_results {
+  * id : int <<PK>>
+  --
+  player_uuid : varchar(64) <<FK players.player_uuid>>
+  level_index : int NOT NULL
+  level_id : varchar(64) NULL
+  duration_seconds : float NOT NULL
+  stars : int NOT NULL
+  sent_at : timestamptz NOT NULL
+  created_at : timestamptz NOT NULL
+}
+
+players ||--o{ level_results : "1 -> N"
+
+note right of level_results
+  stars in [0..3]
+  on delete player => delete level_results
+end note
+
+@enduml

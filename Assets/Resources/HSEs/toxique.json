@@ -1,0 +1,19 @@
+{
+  "id": "toxique",
+  "title": "Toxique",
+  "subtitle": "Danger HSE",
+  "shortDescription": "Substances pouvant provoquer des effets graves sur la santé.",
+  "detailedDescription": "Une exposition par inhalation, ingestion ou contact cutané peut entraîner des intoxications aiguës ou chroniques et des effets sévères sur l'organisme.",
+  "safetyNotes": "Manipuler sous hotte, éviter toute exposition inutile, porter EPI adaptés et respecter strictement les protocoles de sécurité.",
+  "atlasTextureResource": "HSEs/HSE-2",
+  "atlasX": 0,
+  "atlasY": 156,
+  "atlasWidth": 159,
+  "atlasHeight": 156,
+  "imageResource": "HSEs/HSE-2",
+  "tags": [
+    "toxique",
+    "hse",
+    "santé"
+  ]
+}

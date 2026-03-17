@@ -3796,6 +3796,9 @@ MonoBehaviour:
   splashFadeOutDuration: 0.6
   levelCount: 6
   inGameSceneName: InGame
+  rightSubPageIcon1: icon_chemicals.png
+  rightSubPageIcon2: icon_methods.png
+  rightSubPageIcon3: icon_HSE.png
 --- !u!1 &2064059855
 GameObject:
   m_ObjectHideFlags: 0

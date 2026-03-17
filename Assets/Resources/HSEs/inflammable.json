@@ -1,0 +1,19 @@
+{
+  "id": "inflammable",
+  "title": "Inflammable",
+  "subtitle": "Danger HSE",
+  "shortDescription": "Produit qui s'enflamme facilement en présence d'une source de chaleur ou d'étincelles.",
+  "detailedDescription": "Les liquides et vapeurs inflammables peuvent former avec l'air des mélanges explosifs susceptibles de s'enflammer rapidement.",
+  "safetyNotes": "Tenir éloigné des flammes, étincelles et surfaces chaudes, travailler en zone ventilée et utiliser du matériel adapté.",
+  "atlasTextureResource": "HSEs/HSE-2",
+  "atlasX": 159,
+  "atlasY": 156,
+  "atlasWidth": 159,
+  "atlasHeight": 156,
+  "imageResource": "HSEs/HSE-2",
+  "tags": [
+    "inflammable",
+    "hse",
+    "incendie"
+  ]
+}

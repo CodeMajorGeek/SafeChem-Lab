@@ -1,0 +1,20 @@
+{
+  "id": "csso4",
+  "displayName": "CsSO4",
+  "formula": "CsSO4",
+  "shortDescription": "Sulfate de césium, sel inorganique utilisé en chimie analytique et en recherches spécialisées.",
+  "hazardSummary": "Peut provoquer irritation de la peau, des yeux et des voies respiratoires sous forme de poussières.",
+  "handlingNotes": "Manipuler avec gants et lunettes, éviter formation et inhalation de poussières, travailler en zone ventilée.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 12,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "sulfate",
+    "césium",
+    "sel"
+  ]
+}

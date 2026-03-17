@@ -1,0 +1,19 @@
+{
+  "id": "filtration-gravite",
+  "title": "Filtration gravité",
+  "subtitle": "Séparation solide-liquide",
+  "shortDescription": "Séparation d'un solide et d'un liquide par passage à travers un filtre sous l'effet de la gravité.",
+  "detailedDescription": "Placer un papier filtre plié dans l'entonnoir, humidifier si nécessaire, verser le mélange lentement le long de la paroi puis collecter le filtrat dans un récipient propre.",
+  "safetyNotes": "Éviter débordement, stabiliser la verrerie, manipuler prudemment et évacuer les résidus selon les procédures adaptées.",
+  "atlasTextureResource": "Methods/verrie-1",
+  "atlasX": 733,
+  "atlasY": 400,
+  "atlasWidth": 291,
+  "atlasHeight": 380,
+  "imageResource": "Methods/verrie-1",
+  "tags": [
+    "filtration",
+    "séparation",
+    "gravité"
+  ]
+}

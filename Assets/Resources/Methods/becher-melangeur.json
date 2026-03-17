@@ -1,0 +1,19 @@
+{
+  "id": "becher-melangeur",
+  "title": "Bécher + mélangeur",
+  "subtitle": "Mise en solution",
+  "shortDescription": "Mélange de réactifs en bécher avec agitation pour homogénéiser et accélérer la dissolution.",
+  "detailedDescription": "Introduire les réactifs dans le bécher, placer sur agitateur, ajuster la vitesse puis contrôler la dissolution, l'homogénéité et la température du mélange.",
+  "safetyNotes": "Porter lunettes et gants, éviter projections et sur-remplissage, maintenir le bécher stable sur l'agitateur.",
+  "atlasTextureResource": "Methods/verrie-1",
+  "atlasX": 0,
+  "atlasY": 0,
+  "atlasWidth": 300,
+  "atlasHeight": 300,
+  "imageResource": "Methods/verrie-1",
+  "tags": [
+    "mélange",
+    "agitation",
+    "bécher"
+  ]
+}

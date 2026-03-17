@@ -2,16 +2,16 @@
   "id": "nom-court-documentation",
   "title": "Titre de la fiche",
   "category": "Famille ou type",
-  "shortDescription": "Resume tres court de ce que la reaction, le procede ou la fiche explique. Tu peux utiliser **gras** si besoin.",
-  "whyItMatters": "Explique en une phrase pourquoi cette fiche aide le joueur a reussir un niveau. Tu peux utiliser **gras** si besoin.",
+  "shortDescription": "Résumé très court de ce que la réaction, le procédé ou la fiche explique. Tu peux utiliser **gras** si besoin.",
+  "whyItMatters": "Explique en une phrase pourquoi cette fiche aide le joueur à réussir un niveau. Tu peux utiliser **gras** si besoin.",
   "sections": [
     {
       "heading": "Principe",
-      "body": "Explique simplement le mecanisme ou l'idee generale. Tu peux utiliser **gras** dans le texte."
+      "body": "Explique simplement le mécanisme ou l'idée générale. Tu peux utiliser **gras** dans le texte."
     },
     {
-      "heading": "Ce qu'il faut verifier",
-      "body": "Donne les points a controler pour choisir cette piste plutot qu'une autre."
+      "heading": "Ce qu'il faut vérifier",
+      "body": "Donne les points à contrôler pour choisir cette piste plutôt qu'une autre."
     },
     {
       "heading": "Indice pratique",
@@ -19,8 +19,8 @@
     }
   ],
   "keywords": [
-    "mot-cle-1",
-    "mot-cle-2",
-    "mot-cle-3"
+    "mot-clé-1",
+    "mot-clé-2",
+    "mot-clé-3"
   ]
 }

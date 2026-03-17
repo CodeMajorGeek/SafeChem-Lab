@@ -1,0 +1,20 @@
+{
+  "id": "ethanol",
+  "displayName": "Éthanol",
+  "formula": "C2H6O",
+  "shortDescription": "Alcool organique courant utilisé comme solvant, désinfectant et réactif en laboratoire.",
+  "hazardSummary": "Liquide et vapeurs très inflammables, peut provoquer irritation des yeux et effets narcotiques à forte exposition.",
+  "handlingNotes": "Tenir loin des flammes et sources d'ignition, travailler en zone ventilée, porter lunettes et gants de protection.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 4,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "alcool",
+    "inflammable",
+    "C2H6O"
+  ]
+}

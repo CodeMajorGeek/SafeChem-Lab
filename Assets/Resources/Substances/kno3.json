@@ -1,0 +1,20 @@
+{
+  "id": "kno3",
+  "displayName": "KNO3",
+  "formula": "KNO3",
+  "shortDescription": "Nitrate de potassium, sel inorganique oxydant utilisé en chimie, agriculture et certaines formulations.",
+  "hazardSummary": "Comburant pouvant intensifier un incendie, peut provoquer irritation des yeux et des voies respiratoires.",
+  "handlingNotes": "Stocker loin des matières combustibles et réductrices, conserver au sec et manipuler avec gants et lunettes.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 6,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "oxydant",
+    "sel",
+    "nitrate"
+  ]
+}

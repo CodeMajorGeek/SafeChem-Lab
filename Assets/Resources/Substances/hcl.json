@@ -1,0 +1,20 @@
+{
+  "id": "hcl",
+  "displayName": "HCl",
+  "formula": "HCl",
+  "shortDescription": "Acide chlorhydrique, acide minéral fort très utilisé en analyse, nettoyage et synthèse.",
+  "hazardSummary": "Corrosif, provoque brûlures cutanées et lésions oculaires, dégage des vapeurs irritantes.",
+  "handlingNotes": "Utiliser sous hotte, porter gants, lunettes et blouse, éviter inhalation et stocker séparé des bases.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 2,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "acide",
+    "minéral",
+    "corrosif"
+  ]
+}

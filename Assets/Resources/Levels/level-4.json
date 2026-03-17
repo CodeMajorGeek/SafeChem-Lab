@@ -1,0 +1,9 @@
+{
+  "id": "level-4",
+  "levelIndex": 4,
+  "title": "Niveau 4",
+  "summary": "Optimisation du rendement avec contraintes de sécurité renforcées.",
+  "objective": "Atteindre le rendement cible tout en respectant les protocoles.",
+  "hseFocus": "Vérifier check-list HSE complète avant simulation finale.",
+  "sceneName": "InGame"
+}

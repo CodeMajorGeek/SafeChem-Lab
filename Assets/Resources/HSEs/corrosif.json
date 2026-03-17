@@ -1,0 +1,19 @@
+{
+  "id": "corrosif",
+  "title": "Corrosif",
+  "subtitle": "Danger HSE",
+  "shortDescription": "Substances capables d'attaquer les tissus vivants et certains matériaux.",
+  "detailedDescription": "Peut provoquer brûlures cutanées sévères et lésions oculaires graves. Certaines substances corrosives réagissent également avec les métaux ou dégagent des vapeurs dangereuses.",
+  "safetyNotes": "Toujours porter gants, lunettes et blouse. Manipuler avec précaution et rincer immédiatement en cas de contact.",
+  "atlasTextureResource": "HSEs/HSE-2",
+  "atlasX": 0,
+  "atlasY": 0,
+  "atlasWidth": 159,
+  "atlasHeight": 156,
+  "imageResource": "HSEs/HSE-2",
+  "tags": [
+    "corrosif",
+    "hse",
+    "brûlure"
+  ]
+}

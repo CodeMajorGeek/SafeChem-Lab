@@ -1,0 +1,18 @@
+{
+  "id": "hse-id",
+  "title": "Nom HSE",
+  "subtitle": "Danger HSE",
+  "shortDescription": "Résumé",
+  "detailedDescription": "Détail",
+  "safetyNotes": "Consigne",
+  "atlasTextureResource": "HSEs/HSE-2",
+  "atlasX": 0,
+  "atlasY": 0,
+  "atlasWidth": 159,
+  "atlasHeight": 156,
+  "imageResource": "HSEs/HSE-2",
+  "tags": [
+    "mot-clé-1",
+    "mot-clé-2"
+  ]
+}

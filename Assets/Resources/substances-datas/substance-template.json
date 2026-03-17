@@ -1,0 +1,14 @@
+{
+  "id": "substance-id",
+  "displayName": "Nom substance",
+  "formula": "Formule",
+  "shortDescription": "Description courte pour la carte.",
+  "hazardSummary": "Risques principaux / HSE.",
+  "handlingNotes": "Consignes de manipulation et stockage.",
+  "moléculeImageResource": "Substances/nom-image",
+  "cardImageResource": "Substances/nom-image",
+  "tags": [
+    "mot-clé-1",
+    "mot-clé-2"
+  ]
+}

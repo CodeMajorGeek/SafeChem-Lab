@@ -1,0 +1,18 @@
+{
+  "id": "method-id",
+  "title": "Nom méthode",
+  "subtitle": "Sous-titre",
+  "shortDescription": "Résumé court",
+  "detailedDescription": "Procédure",
+  "safetyNotes": "Notes sécurité",
+  "atlasTextureResource": "Methods/verrie-1",
+  "atlasX": 0,
+  "atlasY": 0,
+  "atlasWidth": 300,
+  "atlasHeight": 300,
+  "imageResource": "Methods/verrie-1",
+  "tags": [
+    "mot-clé-1",
+    "mot-clé-2"
+  ]
+}

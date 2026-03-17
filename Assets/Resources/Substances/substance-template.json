@@ -1,0 +1,19 @@
+{
+  "id": "substance-id",
+  "displayName": "Nom substance",
+  "formula": "Formule brute",
+  "shortDescription": "Description courte pour la carte.",
+  "hazardSummary": "Risques principaux / HSE.",
+  "handlingNotes": "Consignes de manipulation et stockage.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 1,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Substances/fallback-molécule",
+  "cardImageResource": "Substances/fallback-card",
+  "tags": [
+    "mot-clé-1",
+    "mot-clé-2"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "level-5",
+  "levelIndex": 5,
+  "title": "Niveau 5",
+  "summary": "Scénario final: autonomie complète sur la chaîne de production.",
+  "objective": "Réaliser la synthèse finale et valider la qualité du produit.",
+  "hseFocus": "Zéro incident: maîtrise des risques corrosif, toxique et inflammable.",
+  "sceneName": "InGame"
+}

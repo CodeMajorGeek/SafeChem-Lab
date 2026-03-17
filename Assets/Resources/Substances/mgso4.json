@@ -1,0 +1,20 @@
+{
+  "id": "mgso4",
+  "displayName": "MgSO4",
+  "formula": "MgSO4",
+  "shortDescription": "Sulfate de magnésium, sel inorganique courant utilisé en chimie, agriculture et applications pharmaceutiques.",
+  "hazardSummary": "Faible danger en conditions normales, mais la poussière peut provoquer irritation des yeux et des voies respiratoires.",
+  "handlingNotes": "Limiter la formation de poussière, porter gants et lunettes si manipulation de poudre, travailler en zone ventilée.",
+  "atlasTextureResource": "Substances/substances-1",
+  "atlasCellIndex": 11,
+  "atlasColumns": 4,
+  "atlasCellWidth": 78,
+  "atlasCellHeight": 114,
+  "moléculeImageResource": "Icons/icon_chemicals",
+  "cardImageResource": "Icons/icon_chemicals",
+  "tags": [
+    "sulfate",
+    "magnésium",
+    "sel"
+  ]
+}

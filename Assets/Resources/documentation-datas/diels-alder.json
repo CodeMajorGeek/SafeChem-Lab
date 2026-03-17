@@ -1,27 +1,27 @@
 {
   "id": "diels-alder",
-  "title": "Reaction de Diels-Alder",
+  "title": "Réaction de Diels-Alder",
   "category": "Cycloaddition",
-  "shortDescription": "La reaction de Diels-Alder assemble un diene et un dienophile pour former rapidement un cycle a six atomes.",
-  "whyItMatters": "Dans le jeu, cette fiche aide a reconnaitre quand deux reactifs peuvent construire un cycle de maniere efficace sans multiplier les etapes inutiles.",
+  "shortDescription": "La réaction de Diels-Alder assemble un diène et un diénophile pour former rapidement un cycle à six atomes.",
+  "whyItMatters": "Dans le jeu, cette fiche aide à reconnaître quand deux réactifs peuvent construire un cycle de manière efficace sans multiplier les étapes inutiles.",
   "sections": [
     {
       "heading": "Principe",
-      "body": "Le diene doit pouvoir adopter une forme favorable pour reagir avec un dienophile, souvent une molecule possedant une double liaison rendue plus reactive par des groupes attracteurs d'electrons."
+      "body": "Le diène doit pouvoir adopter une forme favorable pour réagir avec un diénophile, souvent une molécule possédant une double liaison rendue plus réactive par des groupes attracteurs d'électrons."
     },
     {
-      "heading": "Ce qu'il faut verifier",
-      "body": "Cherche un diene conjugue et un partenaire insature compatible. Si la molecule cible contient un cycle a six membres avec une nouvelle double liaison, pense a Diels-Alder."
+      "heading": "Ce qu'il faut vérifier",
+      "body": "Cherche un diène conjugué et un partenaire insaturé compatible. Si la molécule cible contient un cycle à six membres avec une nouvelle double liaison, pense à Diels-Alder."
     },
     {
       "heading": "Indice pratique",
-      "body": "Si l'objectif est de former un cycle en une seule etape propre, cette reaction est souvent une bonne piste. Elle demande surtout de choisir les bons reactifs de depart."
+      "body": "Si l'objectif est de former un cycle en une seule étape propre, cette réaction est souvent une bonne piste. Elle demande surtout de choisir les bons réactifs de départ."
     }
   ],
   "keywords": [
-    "diene",
-    "dienophile",
-    "cycle a 6",
-    "synthese rapide"
+    "diène",
+    "diénophile",
+    "cycle à 6",
+    "synthèse rapide"
   ]
 }
