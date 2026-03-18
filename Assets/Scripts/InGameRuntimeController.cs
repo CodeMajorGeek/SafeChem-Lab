@@ -514,6 +514,7 @@ public class InGameRuntimeController : MonoBehaviour
 
     private void BuildUi()
     {
+        MobileScreenUtility.ForcePortraitOrientation();
         _canvas = gameObject.AddComponent<Canvas>();
         _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>();
@@ -608,6 +609,7 @@ public class InGameRuntimeController : MonoBehaviour
 
     private void BuildGamePanel()
     {
+        SafeAreaInsets safeInsets = MobileScreenUtility.GetSafeAreaInsets(_root);
         _gamePanel = EnsureRect(_root, "GamePanel");
         Stretch(_gamePanel, 0f, 0f, 0f, 0f);
 
@@ -616,10 +618,17 @@ public class InGameRuntimeController : MonoBehaviour
         topBar.anchorMax = new Vector2(1f, 1f);
         topBar.pivot = new Vector2(0.5f, 1f);
         topBar.anchoredPosition = Vector2.zero;
-        topBar.sizeDelta = new Vector2(0f, 140f);
+        topBar.sizeDelta = new Vector2(0f, 140f + safeInsets.top);
         EnsureImage(topBar).color = new Color(0.05f, 0.09f, 0.14f, 0.9f);
 
-        _timerText = EnsureText(topBar, "Timer", 32, FontStyle.Bold, "00:00");
+        RectTransform topBarContent = EnsureRect(topBar, "SafeContent");
+        topBarContent.anchorMin = Vector2.zero;
+        topBarContent.anchorMax = Vector2.one;
+        topBarContent.offsetMin = new Vector2(safeInsets.left, 0f);
+        topBarContent.offsetMax = new Vector2(-safeInsets.right, -safeInsets.top);
+        EnsureImage(topBarContent).color = new Color(1f, 1f, 1f, 0f);
+
+        _timerText = EnsureText(topBarContent, "Timer", 32, FontStyle.Bold, "00:00");
         _timerText.alignment = TextAnchor.MiddleLeft;
         RectTransform timerRt = _timerText.rectTransform;
         timerRt.anchorMin = new Vector2(0f, 0f);
@@ -628,11 +637,11 @@ public class InGameRuntimeController : MonoBehaviour
         timerRt.anchoredPosition = new Vector2(18f, 0f);
         timerRt.sizeDelta = new Vector2(220f, 0f);
 
-        _stepTitleText = EnsureText(topBar, "StepTitle", 34, FontStyle.Bold, "Etape");
+        _stepTitleText = EnsureText(topBarContent, "StepTitle", 34, FontStyle.Bold, "Etape");
         _stepTitleText.alignment = TextAnchor.MiddleCenter;
         Stretch(_stepTitleText.rectTransform, 220f, 220f, 8f, 56f);
 
-        _phaseInstructionText = EnsureText(topBar, "PhaseInstruction", 24, FontStyle.Normal, string.Empty);
+        _phaseInstructionText = EnsureText(topBarContent, "PhaseInstruction", 24, FontStyle.Normal, string.Empty);
         _phaseInstructionText.alignment = TextAnchor.MiddleCenter;
         _phaseInstructionText.color = new Color(0.84f, 0.91f, 1f, 1f);
         Stretch(_phaseInstructionText.rectTransform, 210f, 210f, 64f, 8f);
@@ -640,8 +649,8 @@ public class InGameRuntimeController : MonoBehaviour
         _slotsArea = EnsureRect(_gamePanel, "SlotsArea");
         _slotsArea.anchorMin = new Vector2(0f, 0f);
         _slotsArea.anchorMax = new Vector2(1f, 1f);
-        _slotsArea.offsetMin = new Vector2(0f, 320f);
-        _slotsArea.offsetMax = new Vector2(0f, -160f);
+        _slotsArea.offsetMin = new Vector2(safeInsets.left, 320f + safeInsets.bottom);
+        _slotsArea.offsetMax = new Vector2(-safeInsets.right, -(160f + safeInsets.top));
         EnsureImage(_slotsArea).color = new Color(1f, 1f, 1f, 0f);
 
         _slotsByKind[InGameCardKind.Method] = new List<InGameDropSlot>();
@@ -679,14 +688,14 @@ public class InGameRuntimeController : MonoBehaviour
         tray.anchorMax = new Vector2(1f, 0f);
         tray.pivot = new Vector2(0.5f, 0f);
         tray.anchoredPosition = Vector2.zero;
-        tray.sizeDelta = new Vector2(0f, 310f);
+        tray.sizeDelta = new Vector2(0f, 310f + safeInsets.bottom);
         EnsureImage(tray).color = new Color(0.03f, 0.07f, 0.12f, 0.96f);
 
         _trayViewport = EnsureRect(tray, "Viewport");
         _trayViewport.anchorMin = Vector2.zero;
         _trayViewport.anchorMax = Vector2.one;
-        _trayViewport.offsetMin = new Vector2(16f, 20f);
-        _trayViewport.offsetMax = new Vector2(-16f, -20f);
+        _trayViewport.offsetMin = new Vector2(16f + safeInsets.left, 20f + safeInsets.bottom);
+        _trayViewport.offsetMax = new Vector2(-(16f + safeInsets.right), -20f);
         EnsureImage(_trayViewport).color = new Color(1f, 1f, 1f, 0.04f);
         Mask mask = _trayViewport.GetComponent<Mask>();
         if (mask == null) mask = _trayViewport.gameObject.AddComponent<Mask>();
@@ -707,6 +716,11 @@ public class InGameRuntimeController : MonoBehaviour
         _trayScroll.content = _trayContent;
         _trayScroll.movementType = ScrollRect.MovementType.Clamped;
         _trayScroll.scrollSensitivity = 24f;
+        if (_trayScroll.horizontalScrollbar != null)
+        {
+            _trayScroll.horizontalScrollbar.gameObject.SetActive(false);
+            _trayScroll.horizontalScrollbar = null;
+        }
 
         _gamePanel.gameObject.SetActive(false);
     }

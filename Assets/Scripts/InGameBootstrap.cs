@@ -19,6 +19,7 @@ public static class InGameBootstrap
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void RegisterInGameHook()
     {
+        MobileScreenUtility.ForcePortraitOrientation();
         SceneManager.sceneLoaded -= OnSceneLoaded;
         SceneManager.sceneLoaded += OnSceneLoaded;
         RuntimeFileLogger.Log("InGameBootstrap", "Scene hook registered.");

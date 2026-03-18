@@ -41,6 +41,14 @@ public class HomePagerSnap : MonoBehaviour, IBeginDragHandler, IEndDragHandler
         JumpToPage(CurrentPage);
     }
 
+    private void OnRectTransformDimensionsChange()
+    {
+        if (!isActiveAndEnabled || scrollRect == null)
+            return;
+
+        JumpToPage(CurrentPage);
+    }
+
     private void OnDisable()
     {
         if (snapCo != null)

@@ -81,10 +81,13 @@ public class HomeSceneLayoutFix : MonoBehaviour
     private readonly List<LevelDefinitionData> _levels = new List<LevelDefinitionData>();
     private bool _settingsOpen;
     private Coroutine _settingsAnim;
+    private Rect _lastSafeArea = new Rect(-1f, -1f, -1f, -1f);
+    private Vector2 _lastCanvasSize = new Vector2(-1f, -1f);
 
     private void Start()
     {
         if (!fixOnStart) return;
+        MobileScreenUtility.ForcePortraitOrientation();
         RuntimeFileLogger.Log("HomeSceneLayoutFix", "Start fixOnStart=true headerHeight=" + headerHeight + " footerHeight=" + footerHeight);
         _scroll = FindFirstObjectByType<ScrollRect>();
         Canvas canvas = FindFirstObjectByType<Canvas>();
@@ -114,6 +117,17 @@ public class HomeSceneLayoutFix : MonoBehaviour
         HookPagerEvents();
 
         if (showSplash) StartCoroutine(ShowSplash());
+    }
+
+    private void LateUpdate()
+    {
+        if (!fixOnStart || _canvasRt == null)
+            return;
+
+        if (!HasResponsiveMetricsChanged())
+            return;
+
+        ApplyResponsiveLayout();
     }
 
     private void OnDisable()
@@ -153,6 +167,7 @@ public class HomeSceneLayoutFix : MonoBehaviour
     private void ConfigureViewportForSharedChrome()
     {
         if (_scroll == null) return;
+        SafeAreaInsets safeInsets = MobileScreenUtility.GetSafeAreaInsets(_canvasRt);
 
         Image pagerImage = _scroll.GetComponent<Image>();
         if (pagerImage != null)
@@ -166,8 +181,8 @@ public class HomeSceneLayoutFix : MonoBehaviour
         {
             pagerRt.anchorMin = Vector2.zero;
             pagerRt.anchorMax = Vector2.one;
-            pagerRt.offsetMin = new Vector2(0f, footerHeight);
-            pagerRt.offsetMax = new Vector2(0f, -headerHeight);
+            pagerRt.offsetMin = new Vector2(safeInsets.left, footerHeight + safeInsets.bottom);
+            pagerRt.offsetMax = new Vector2(-safeInsets.right, -(headerHeight + safeInsets.top));
             RuntimeFileLogger.Log("HomeSceneLayoutFix", "Pager offsets min=" + pagerRt.offsetMin + " max=" + pagerRt.offsetMax);
         }
 
@@ -180,21 +195,36 @@ public class HomeSceneLayoutFix : MonoBehaviour
             viewport.offsetMax = Vector2.zero;
         }
 
+        if (_scroll.horizontalScrollbar != null)
+        {
+            _scroll.horizontalScrollbar.gameObject.SetActive(false);
+            _scroll.horizontalScrollbar = null;
+        }
+        if (_scroll.verticalScrollbar != null)
+        {
+            _scroll.verticalScrollbar.gameObject.SetActive(false);
+            _scroll.verticalScrollbar = null;
+        }
+
         HomePagerPageSizer sizer = FindFirstObjectByType<HomePagerPageSizer>();
         if (sizer != null)
             sizer.Apply();
 
         if (_scroll.content != null)
             LayoutRebuilder.ForceRebuildLayoutImmediate(_scroll.content);
+
+        if (_pagerSnap != null)
+            _pagerSnap.JumpToPage(_pagerSnap.CurrentPage);
     }
 
     private void NormalizeHeader(RectTransform header)
     {
+        SafeAreaInsets safeInsets = MobileScreenUtility.GetSafeAreaInsets(_canvasRt);
         header.anchorMin = new Vector2(0f, 1f);
         header.anchorMax = new Vector2(1f, 1f);
         header.pivot = new Vector2(0.5f, 1f);
         header.anchoredPosition = Vector2.zero;
-        header.sizeDelta = new Vector2(0f, headerHeight);
+        header.sizeDelta = new Vector2(0f, headerHeight + safeInsets.top);
         RuntimeFileLogger.Log("HomeSceneLayoutFix", "NormalizeHeader height=" + headerHeight);
 
         Image bg = EnsureImage(header);
@@ -218,7 +248,7 @@ public class HomeSceneLayoutFix : MonoBehaviour
             RectTransform logoRt = EnsureRect(header, "Logo");
             logoRt.anchorMin = logoRt.anchorMax = new Vector2(0.5f, 1f);
             logoRt.pivot = new Vector2(0.5f, 1f);
-            logoRt.anchoredPosition = new Vector2(0f, -15f);
+            logoRt.anchoredPosition = new Vector2(0f, -(15f + safeInsets.top));
             float targetHeight = Mathf.Min(headerHeight - 18f, _canvasRt.rect.height * 0.16f);
             float aspect = logo.rect.height > 0f ? logo.rect.width / logo.rect.height : 3f;
             logoRt.sizeDelta = new Vector2(Mathf.Min(_canvasRt.rect.width * 0.68f, targetHeight * aspect), targetHeight);
@@ -231,9 +261,9 @@ public class HomeSceneLayoutFix : MonoBehaviour
         }
 
         RectTransform settingsRt = EnsureRect(header, "BtnSettings");
-        settingsRt.anchorMin = settingsRt.anchorMax = new Vector2(0f, 0.5f);
-        settingsRt.pivot = new Vector2(0f, 0.5f);
-        settingsRt.anchoredPosition = new Vector2(24f, -18f);
+        settingsRt.anchorMin = settingsRt.anchorMax = new Vector2(0f, 1f);
+        settingsRt.pivot = new Vector2(0f, 1f);
+        settingsRt.anchoredPosition = new Vector2(24f + safeInsets.left, -(20f + safeInsets.top));
         settingsRt.sizeDelta = new Vector2(184f, 184f);
         Image settingsImage = EnsureImage(settingsRt);
         settingsImage.sprite = LoadSprite("Icons/param");
@@ -253,11 +283,12 @@ public class HomeSceneLayoutFix : MonoBehaviour
 
     private void NormalizeFooter(RectTransform footer)
     {
+        SafeAreaInsets safeInsets = MobileScreenUtility.GetSafeAreaInsets(_canvasRt);
         footer.anchorMin = new Vector2(0f, 0f);
         footer.anchorMax = new Vector2(1f, 0f);
         footer.pivot = new Vector2(0.5f, 0f);
         footer.anchoredPosition = Vector2.zero;
-        footer.sizeDelta = new Vector2(0f, footerHeight);
+        footer.sizeDelta = new Vector2(0f, footerHeight + safeInsets.bottom);
 
         Image bg = EnsureImage(footer);
         bg.color = new Color(0.03f, 0.06f, 0.1f, 0.98f);
@@ -267,8 +298,8 @@ public class HomeSceneLayoutFix : MonoBehaviour
 
         row.anchorMin = Vector2.zero;
         row.anchorMax = Vector2.one;
-        row.offsetMin = new Vector2(24f, 16f);
-        row.offsetMax = new Vector2(-24f, -16f);
+        row.offsetMin = new Vector2(24f + safeInsets.left, 16f + safeInsets.bottom);
+        row.offsetMax = new Vector2(-(24f + safeInsets.right), -16f);
         row.localRotation = Quaternion.identity;
         row.localScale = Vector3.one;
 
@@ -845,8 +876,8 @@ public class HomeSceneLayoutFix : MonoBehaviour
         _levelDrawerOverlay = EnsureRect(drawerRoot, "LevelDrawerOverlay");
         _levelDrawerOverlay.anchorMin = Vector2.zero;
         _levelDrawerOverlay.anchorMax = Vector2.one;
-        _levelDrawerOverlay.offsetMin = new Vector2(0f, footerHeight);
-        _levelDrawerOverlay.offsetMax = new Vector2(0f, -headerHeight);
+        _levelDrawerOverlay.offsetMin = new Vector2(0f, GetFooterReservedHeight());
+        _levelDrawerOverlay.offsetMax = new Vector2(0f, -GetHeaderReservedHeight());
         _levelDrawerOverlay.SetAsLastSibling();
         Image overlayBg = EnsureImage(_levelDrawerOverlay);
         overlayBg.color = new Color(0f, 0f, 0f, 0.25f);
@@ -1004,6 +1035,43 @@ public class HomeSceneLayoutFix : MonoBehaviour
             return true;
         float p = _scroll.horizontalNormalizedPosition;
         return Mathf.Abs(p - 0.5f) <= 0.25f;
+    }
+
+    private void ApplyResponsiveLayout()
+    {
+        NormalizeSharedSceneChrome();
+        NormalizeBodiesForOverlay();
+
+        if (_levelDrawerOverlay != null)
+        {
+            _levelDrawerOverlay.offsetMin = new Vector2(0f, GetFooterReservedHeight());
+            _levelDrawerOverlay.offsetMax = new Vector2(0f, -GetHeaderReservedHeight());
+        }
+    }
+
+    private bool HasResponsiveMetricsChanged()
+    {
+        Rect safeArea = Screen.safeArea;
+        Vector2 canvasSize = _canvasRt.rect.size;
+        bool changed = safeArea != _lastSafeArea || canvasSize != _lastCanvasSize;
+        if (changed)
+        {
+            _lastSafeArea = safeArea;
+            _lastCanvasSize = canvasSize;
+        }
+        return changed;
+    }
+
+    private float GetHeaderReservedHeight()
+    {
+        SafeAreaInsets safeInsets = MobileScreenUtility.GetSafeAreaInsets(_canvasRt);
+        return headerHeight + safeInsets.top;
+    }
+
+    private float GetFooterReservedHeight()
+    {
+        SafeAreaInsets safeInsets = MobileScreenUtility.GetSafeAreaInsets(_canvasRt);
+        return footerHeight + safeInsets.bottom;
     }
 
     private void LoadLevelsFromJson(List<LevelDefinitionData> output)

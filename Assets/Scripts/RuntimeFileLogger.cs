@@ -7,6 +7,7 @@ public static class RuntimeFileLogger
     private static readonly object Sync = new object();
     private static string _logPath;
     private static bool _initialized;
+    private static bool _fileLoggingEnabled;
 
     public static string LogPath
     {
@@ -45,14 +46,28 @@ public static class RuntimeFileLogger
             if (_initialized)
                 return;
 
-            string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string logDir = Path.Combine(projectRoot, "Logs");
-            Directory.CreateDirectory(logDir);
-            _logPath = Path.Combine(logDir, "safechem-runtime.log");
-            File.WriteAllText(_logPath, "==== SafeChem Runtime Log ====\n");
             _initialized = true;
+            _fileLoggingEnabled = false;
 
-            WriteLine("INFO", "RuntimeFileLogger", "Log initialized at " + _logPath);
+            try
+            {
+                string logDir = ResolveLogDirectory();
+                if (string.IsNullOrWhiteSpace(logDir))
+                    return;
+
+                Directory.CreateDirectory(logDir);
+                _logPath = Path.Combine(logDir, "safechem-runtime.log");
+                File.WriteAllText(_logPath, "==== SafeChem Runtime Log ====\n");
+                _fileLoggingEnabled = true;
+
+                WriteLine("INFO", "RuntimeFileLogger", "Log initialized at " + _logPath);
+            }
+            catch (Exception exception)
+            {
+                _logPath = string.Empty;
+                _fileLoggingEnabled = false;
+                Debug.LogWarning("[RuntimeFileLogger] File logging disabled: " + exception.Message);
+            }
         }
     }
 
@@ -67,7 +82,49 @@ public static class RuntimeFileLogger
                 source,
                 message,
                 Environment.NewLine);
-            File.AppendAllText(_logPath, line);
+
+            if (_fileLoggingEnabled && !string.IsNullOrWhiteSpace(_logPath))
+            {
+                try
+                {
+                    File.AppendAllText(_logPath, line);
+                }
+                catch (Exception exception)
+                {
+                    _fileLoggingEnabled = false;
+                    Debug.LogWarning("[RuntimeFileLogger] File append failed, fallback to console only: " + exception.Message);
+                }
+            }
+
+            string consoleLine = "[" + source + "] " + message;
+            if (string.Equals(level, "ERROR", StringComparison.Ordinal))
+                Debug.LogError(consoleLine);
+            else if (string.Equals(level, "WARN", StringComparison.Ordinal))
+                Debug.LogWarning(consoleLine);
+            else
+                Debug.Log(consoleLine);
         }
+    }
+
+    private static string ResolveLogDirectory()
+    {
+        try
+        {
+            if (Application.isEditor)
+            {
+                string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+                if (!string.IsNullOrWhiteSpace(projectRoot))
+                    return Path.Combine(projectRoot, "Logs");
+            }
+        }
+        catch
+        {
+        }
+
+        string persistent = Application.persistentDataPath;
+        if (string.IsNullOrWhiteSpace(persistent))
+            return null;
+
+        return Path.Combine(persistent, "Logs");
     }
 }
