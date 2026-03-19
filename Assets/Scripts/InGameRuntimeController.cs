@@ -43,6 +43,16 @@ public class InGameStepData
     public string[] trapSubstanceIds;
     public string[] trapMethodIds;
     public string[] trapHseIds;
+    public InGameTrapErrorData[] trapSubstanceErrors;
+    public InGameTrapErrorData[] trapMethodErrors;
+    public InGameTrapErrorData[] trapHseErrors;
+}
+
+[Serializable]
+public class InGameTrapErrorData
+{
+    public string cardId;
+    public string message;
 }
 
 public class InGameDropSlot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
@@ -401,6 +411,8 @@ public class InGameRuntimeController : MonoBehaviour
 {
     private const string SelectedLevelKey = "SelectedLevel";
     private const string SelectedLevelIdKey = "SelectedLevelId";
+    private const float ExtraCutoutTopPadding = 18f;
+    private const float ExtraSideSafePadding = 14f;
 
     private Canvas _canvas;
     private RectTransform _root;
@@ -421,6 +433,9 @@ public class InGameRuntimeController : MonoBehaviour
     private RectTransform _resultPanel;
     private Text _resultTitle;
     private Text _resultBody;
+    private Text _resultMistakesTitle;
+    private Text _resultMistakesBody;
+    private ScrollRect _resultMistakesScroll;
     private RectTransform _resultStarsRoot;
     private Sprite _starSprite;
 
@@ -438,6 +453,8 @@ public class InGameRuntimeController : MonoBehaviour
     private float _elapsedSeconds;
     private int _errorCount;
     private Vector2 _dragPointerOffset;
+    private Vector2 _lastSlotsAreaSize = new Vector2(-1f, -1f);
+    private readonly List<string> _mistakeLines = new List<string>();
 
     private static readonly Dictionary<string, Sprite> SpriteCache = new Dictionary<string, Sprite>();
 
@@ -448,9 +465,12 @@ public class InGameRuntimeController : MonoBehaviour
             RuntimeFileLogger.Log("InGameRuntimeController", "Start begin on scene=" + SceneManager.GetActiveScene().name);
             PlayerProfileStore.EnsureInitialized();
             LoadLevel();
+            _errorCount = 0;
+            _mistakeLines.Clear();
             BuildUi();
             PrepareStep(0);
             ShowIntroForCurrentStep();
+            StartCoroutine(RefreshResponsiveLayoutNextFrame());
             RuntimeFileLogger.Log("InGameRuntimeController", "Start completed level=" + (_level != null ? _level.id : "null"));
         }
         catch (Exception exception)
@@ -463,9 +483,24 @@ public class InGameRuntimeController : MonoBehaviour
 
     private void Update()
     {
-        if (!_timerRunning) return;
-        _elapsedSeconds = Mathf.Max(0f, Time.unscaledTime - _timerStart);
-        if (_timerText != null) _timerText.text = BuildTimerText(_elapsedSeconds);
+        if (_timerRunning)
+        {
+            _elapsedSeconds = Mathf.Max(0f, Time.unscaledTime - _timerStart);
+            if (_timerText != null) _timerText.text = BuildTimerText(_elapsedSeconds);
+        }
+
+        if (_introPanel == null || !_introPanel.gameObject.activeSelf || _slotsArea == null)
+            return;
+
+        Vector2 size = _slotsArea.rect.size;
+        if (size.x <= 1f || size.y <= 1f)
+            return;
+        if (Mathf.Abs(size.x - _lastSlotsAreaSize.x) <= 1f && Mathf.Abs(size.y - _lastSlotsAreaSize.y) <= 1f)
+            return;
+
+        _lastSlotsAreaSize = size;
+        RebuildSlotsForStep();
+        UpdatePhaseUi();
     }
 
     private void LoadLevel()
@@ -493,7 +528,7 @@ public class InGameRuntimeController : MonoBehaviour
                 new InGameStepData
                 {
                     stepId = "step-1",
-                    stepTitle = "Etape 1",
+                    stepTitle = "Étape 1",
                     stepBrief = _level.objective,
                     introBrief = _level.levelBrief,
                     introObjective = _level.objective,
@@ -581,6 +616,7 @@ public class InGameRuntimeController : MonoBehaviour
         _introBody.color = new Color(0.18f, 0.13f, 0.09f, 1f);
         _introBody.alignment = TextAnchor.UpperLeft;
         _introBody.lineSpacing = 1.12f;
+        _introBody.supportRichText = true;
         _introBody.horizontalOverflow = HorizontalWrapMode.Wrap;
         _introBody.verticalOverflow = VerticalWrapMode.Overflow;
         RectTransform bodyRt = _introBody.rectTransform;
@@ -610,6 +646,9 @@ public class InGameRuntimeController : MonoBehaviour
     private void BuildGamePanel()
     {
         SafeAreaInsets safeInsets = MobileScreenUtility.GetSafeAreaInsets(_root);
+        float extraTopSafe = Mathf.Clamp((_root != null ? _root.rect.height : 1920f) * 0.012f, 12f, 24f) + ExtraCutoutTopPadding;
+        float extraSideSafe = Mathf.Clamp((_root != null ? _root.rect.width : 1080f) * 0.014f, 10f, 22f) + ExtraSideSafePadding;
+
         _gamePanel = EnsureRect(_root, "GamePanel");
         Stretch(_gamePanel, 0f, 0f, 0f, 0f);
 
@@ -618,14 +657,14 @@ public class InGameRuntimeController : MonoBehaviour
         topBar.anchorMax = new Vector2(1f, 1f);
         topBar.pivot = new Vector2(0.5f, 1f);
         topBar.anchoredPosition = Vector2.zero;
-        topBar.sizeDelta = new Vector2(0f, 140f + safeInsets.top);
+        topBar.sizeDelta = new Vector2(0f, 150f + safeInsets.top + extraTopSafe);
         EnsureImage(topBar).color = new Color(0.05f, 0.09f, 0.14f, 0.9f);
 
         RectTransform topBarContent = EnsureRect(topBar, "SafeContent");
         topBarContent.anchorMin = Vector2.zero;
         topBarContent.anchorMax = Vector2.one;
-        topBarContent.offsetMin = new Vector2(safeInsets.left, 0f);
-        topBarContent.offsetMax = new Vector2(-safeInsets.right, -safeInsets.top);
+        topBarContent.offsetMin = new Vector2(safeInsets.left + extraSideSafe, 0f);
+        topBarContent.offsetMax = new Vector2(-(safeInsets.right + extraSideSafe), -(safeInsets.top + extraTopSafe));
         EnsureImage(topBarContent).color = new Color(1f, 1f, 1f, 0f);
 
         _timerText = EnsureText(topBarContent, "Timer", 32, FontStyle.Bold, "00:00");
@@ -637,20 +676,41 @@ public class InGameRuntimeController : MonoBehaviour
         timerRt.anchoredPosition = new Vector2(18f, 0f);
         timerRt.sizeDelta = new Vector2(220f, 0f);
 
-        _stepTitleText = EnsureText(topBarContent, "StepTitle", 34, FontStyle.Bold, "Etape");
-        _stepTitleText.alignment = TextAnchor.MiddleCenter;
-        Stretch(_stepTitleText.rectTransform, 220f, 220f, 8f, 56f);
+        _stepTitleText = EnsureText(topBarContent, "StepTitle", 34, FontStyle.Bold, "Étape");
+        _stepTitleText.alignment = TextAnchor.UpperCenter;
+        _stepTitleText.horizontalOverflow = HorizontalWrapMode.Wrap;
+        _stepTitleText.verticalOverflow = VerticalWrapMode.Truncate;
+        _stepTitleText.resizeTextForBestFit = true;
+        _stepTitleText.resizeTextMinSize = 22;
+        _stepTitleText.resizeTextMaxSize = 36;
+        _stepTitleText.lineSpacing = 0.96f;
+        RectTransform stepRt = _stepTitleText.rectTransform;
+        float textCutoutShift = Mathf.Clamp((_root != null ? _root.rect.height : 1920f) * 0.012f, 16f, 28f);
+        stepRt.anchorMin = new Vector2(0f, 0.42f);
+        stepRt.anchorMax = new Vector2(1f, 0.88f);
+        stepRt.offsetMin = new Vector2(220f, 6f);
+        stepRt.offsetMax = new Vector2(-220f, -(10f + textCutoutShift));
 
         _phaseInstructionText = EnsureText(topBarContent, "PhaseInstruction", 24, FontStyle.Normal, string.Empty);
-        _phaseInstructionText.alignment = TextAnchor.MiddleCenter;
+        _phaseInstructionText.alignment = TextAnchor.UpperCenter;
         _phaseInstructionText.color = new Color(0.84f, 0.91f, 1f, 1f);
-        Stretch(_phaseInstructionText.rectTransform, 210f, 210f, 64f, 8f);
+        _phaseInstructionText.horizontalOverflow = HorizontalWrapMode.Wrap;
+        _phaseInstructionText.verticalOverflow = VerticalWrapMode.Truncate;
+        _phaseInstructionText.resizeTextForBestFit = true;
+        _phaseInstructionText.resizeTextMinSize = 16;
+        _phaseInstructionText.resizeTextMaxSize = 24;
+        _phaseInstructionText.lineSpacing = 1.02f;
+        RectTransform phaseRt = _phaseInstructionText.rectTransform;
+        phaseRt.anchorMin = new Vector2(0f, 0.04f);
+        phaseRt.anchorMax = new Vector2(1f, 0.30f);
+        phaseRt.offsetMin = new Vector2(210f, 2f);
+        phaseRt.offsetMax = new Vector2(-210f, -(8f + (textCutoutShift * 0.45f)));
 
         _slotsArea = EnsureRect(_gamePanel, "SlotsArea");
         _slotsArea.anchorMin = new Vector2(0f, 0f);
         _slotsArea.anchorMax = new Vector2(1f, 1f);
-        _slotsArea.offsetMin = new Vector2(safeInsets.left, 320f + safeInsets.bottom);
-        _slotsArea.offsetMax = new Vector2(-safeInsets.right, -(160f + safeInsets.top));
+        _slotsArea.offsetMin = new Vector2(safeInsets.left + extraSideSafe, 320f + safeInsets.bottom);
+        _slotsArea.offsetMax = new Vector2(-(safeInsets.right + extraSideSafe), -(170f + safeInsets.top + extraTopSafe));
         EnsureImage(_slotsArea).color = new Color(1f, 1f, 1f, 0f);
 
         _slotsByKind[InGameCardKind.Method] = new List<InGameDropSlot>();
@@ -724,53 +784,110 @@ public class InGameRuntimeController : MonoBehaviour
 
         _gamePanel.gameObject.SetActive(false);
     }
-
     private void BuildResultPanel()
     {
         _resultPanel = EnsureRect(_root, "ResultPanel");
         Stretch(_resultPanel, 0f, 0f, 0f, 0f);
-        EnsureImage(_resultPanel).color = new Color(0f, 0f, 0f, 0.68f);
+        EnsureImage(_resultPanel).color = new Color(0f, 0f, 0f, 0.70f);
 
         RectTransform card = EnsureRect(_resultPanel, "ResultCard");
-        card.anchorMin = new Vector2(0.1f, 0.24f);
-        card.anchorMax = new Vector2(0.9f, 0.76f);
-        EnsureImage(card).color = new Color(0.96f, 0.92f, 0.84f, 0.99f);
+        card.anchorMin = new Vector2(0.06f, 0.07f);
+        card.anchorMax = new Vector2(0.94f, 0.93f);
+        EnsureImage(card).color = new Color(0.08f, 0.12f, 0.20f, 0.96f);
 
-        _resultTitle = EnsureText(card, "Title", 48, FontStyle.Bold, "Résultat");
-        _resultTitle.color = new Color(0.16f, 0.11f, 0.07f, 1f);
+        RectTransform paper = EnsureRect(card, "Paper");
+        Stretch(paper, 10f, 10f, 10f, 10f);
+        EnsureImage(paper).color = new Color(0.95f, 0.91f, 0.82f, 0.98f);
+
+        _resultTitle = EnsureText(paper, "Title", 52, FontStyle.Bold, "Résultat du niveau");
+        _resultTitle.color = new Color(0.17f, 0.12f, 0.08f, 1f);
         _resultTitle.alignment = TextAnchor.UpperCenter;
         RectTransform titleRt = _resultTitle.rectTransform;
         titleRt.anchorMin = new Vector2(0f, 1f);
         titleRt.anchorMax = new Vector2(1f, 1f);
         titleRt.pivot = new Vector2(0.5f, 1f);
-        titleRt.anchoredPosition = new Vector2(0f, -24f);
-        titleRt.sizeDelta = new Vector2(-40f, 60f);
+        titleRt.anchoredPosition = new Vector2(0f, -20f);
+        titleRt.sizeDelta = new Vector2(-50f, 64f);
 
-        _resultStarsRoot = EnsureRect(card, "Stars");
+        _resultStarsRoot = EnsureRect(paper, "Stars");
         _resultStarsRoot.anchorMin = new Vector2(0.5f, 1f);
         _resultStarsRoot.anchorMax = new Vector2(0.5f, 1f);
         _resultStarsRoot.pivot = new Vector2(0.5f, 1f);
         _resultStarsRoot.anchoredPosition = new Vector2(0f, -90f);
-        _resultStarsRoot.sizeDelta = new Vector2(320f, 130f);
+        _resultStarsRoot.sizeDelta = new Vector2(360f, 140f);
 
-        _resultBody = EnsureText(card, "Body", 30, FontStyle.Normal, string.Empty);
-        _resultBody.color = new Color(0.19f, 0.13f, 0.09f, 1f);
+        _resultBody = EnsureText(paper, "Body", 30, FontStyle.Normal, string.Empty);
+        _resultBody.color = new Color(0.20f, 0.14f, 0.10f, 1f);
         _resultBody.alignment = TextAnchor.MiddleCenter;
         _resultBody.supportRichText = true;
         RectTransform bodyRt = _resultBody.rectTransform;
-        bodyRt.anchorMin = new Vector2(0f, 0f);
-        bodyRt.anchorMax = new Vector2(1f, 1f);
-        bodyRt.offsetMin = new Vector2(24f, 148f);
-        bodyRt.offsetMax = new Vector2(-24f, -226f);
+        bodyRt.anchorMin = new Vector2(0.08f, 0.58f);
+        bodyRt.anchorMax = new Vector2(0.92f, 0.72f);
+        bodyRt.offsetMin = Vector2.zero;
+        bodyRt.offsetMax = Vector2.zero;
 
-        RectTransform homeBtnRt = EnsureRect(card, "BtnHome");
+        _resultMistakesTitle = EnsureText(paper, "MistakesTitle", 30, FontStyle.Bold, "Résumé des erreurs");
+        _resultMistakesTitle.color = new Color(0.14f, 0.10f, 0.07f, 1f);
+        _resultMistakesTitle.alignment = TextAnchor.MiddleLeft;
+        RectTransform mistakesTitleRt = _resultMistakesTitle.rectTransform;
+        mistakesTitleRt.anchorMin = new Vector2(0.08f, 0.50f);
+        mistakesTitleRt.anchorMax = new Vector2(0.92f, 0.56f);
+        mistakesTitleRt.offsetMin = Vector2.zero;
+        mistakesTitleRt.offsetMax = Vector2.zero;
+
+        RectTransform mistakesPanel = EnsureRect(paper, "MistakesPanel");
+        mistakesPanel.anchorMin = new Vector2(0.08f, 0.19f);
+        mistakesPanel.anchorMax = new Vector2(0.92f, 0.49f);
+        mistakesPanel.offsetMin = Vector2.zero;
+        mistakesPanel.offsetMax = Vector2.zero;
+        EnsureImage(mistakesPanel).color = new Color(0.14f, 0.11f, 0.08f, 0.16f);
+
+        RectTransform mistakesViewport = EnsureRect(mistakesPanel, "Viewport");
+        Stretch(mistakesViewport, 12f, 12f, 12f, 12f);
+        Image viewportImage = EnsureImage(mistakesViewport);
+        viewportImage.color = new Color(1f, 1f, 1f, 0.04f);
+        Mask mask = mistakesViewport.GetComponent<Mask>();
+        if (mask == null) mask = mistakesViewport.gameObject.AddComponent<Mask>();
+        mask.showMaskGraphic = false;
+
+        RectTransform mistakesContent = EnsureRect(mistakesViewport, "Content");
+        mistakesContent.anchorMin = new Vector2(0f, 1f);
+        mistakesContent.anchorMax = new Vector2(1f, 1f);
+        mistakesContent.pivot = new Vector2(0.5f, 1f);
+        mistakesContent.anchoredPosition = Vector2.zero;
+        mistakesContent.sizeDelta = new Vector2(0f, 10f);
+
+        _resultMistakesBody = EnsureText(mistakesContent, "Text", 26, FontStyle.Normal, string.Empty);
+        _resultMistakesBody.color = new Color(0.19f, 0.13f, 0.09f, 1f);
+        _resultMistakesBody.alignment = TextAnchor.UpperLeft;
+        _resultMistakesBody.supportRichText = true;
+        _resultMistakesBody.horizontalOverflow = HorizontalWrapMode.Wrap;
+        _resultMistakesBody.verticalOverflow = VerticalWrapMode.Overflow;
+        RectTransform mistakesBodyRt = _resultMistakesBody.rectTransform;
+        mistakesBodyRt.anchorMin = new Vector2(0f, 1f);
+        mistakesBodyRt.anchorMax = new Vector2(1f, 1f);
+        mistakesBodyRt.pivot = new Vector2(0.5f, 1f);
+        mistakesBodyRt.anchoredPosition = Vector2.zero;
+        mistakesBodyRt.sizeDelta = new Vector2(0f, 10f);
+
+        _resultMistakesScroll = mistakesPanel.GetComponent<ScrollRect>();
+        if (_resultMistakesScroll == null) _resultMistakesScroll = mistakesPanel.gameObject.AddComponent<ScrollRect>();
+        _resultMistakesScroll.viewport = mistakesViewport;
+        _resultMistakesScroll.content = mistakesContent;
+        _resultMistakesScroll.horizontal = false;
+        _resultMistakesScroll.vertical = true;
+        _resultMistakesScroll.movementType = ScrollRect.MovementType.Clamped;
+        _resultMistakesScroll.scrollSensitivity = 22f;
+        _resultMistakesScroll.horizontalScrollbar = null;
+
+        RectTransform homeBtnRt = EnsureRect(paper, "BtnHome");
         homeBtnRt.anchorMin = new Vector2(0.5f, 0f);
         homeBtnRt.anchorMax = new Vector2(0.5f, 0f);
         homeBtnRt.pivot = new Vector2(0.5f, 0f);
         homeBtnRt.anchoredPosition = new Vector2(0f, 34f);
         homeBtnRt.sizeDelta = new Vector2(340f, 82f);
         Image homeBg = EnsureImage(homeBtnRt);
-        homeBg.color = new Color(0.12f, 0.4f, 0.66f, 1f);
+        homeBg.color = new Color(0.14f, 0.42f, 0.69f, 1f);
         Button homeBtn = EnsureButton(homeBtnRt);
         homeBtn.targetGraphic = homeBg;
         homeBtn.onClick.RemoveAllListeners();
@@ -817,6 +934,21 @@ public class InGameRuntimeController : MonoBehaviour
         return slot;
     }
 
+    private float GetSlotsScale()
+    {
+        if (_slotsArea == null)
+            return 1f;
+
+        float width = Mathf.Max(1f, _slotsArea.rect.width);
+        float height = Mathf.Max(1f, _slotsArea.rect.height);
+        float scaleW = width / 960f;
+        float scaleH = height / 1120f;
+        float scale = Mathf.Min(scaleW, scaleH);
+        if (height < 920f)
+            scale *= Mathf.Lerp(0.90f, 0.76f, Mathf.InverseLerp(920f, 640f, height));
+        return Mathf.Clamp(scale, 0.46f, 1.04f);
+    }
+
     private void RebuildSlotsForStep()
     {
         if (_slotsArea == null) return;
@@ -843,46 +975,64 @@ public class InGameRuntimeController : MonoBehaviour
 
     private void BuildMethodSlots(int count)
     {
-        Vector2 size = count > 1 ? new Vector2(270f, 206f) : new Vector2(298f, 222f);
+        float slotScale = GetSlotsScale();
+        const float clusterYOffset = -0.08f;
+        float areaWidth = _slotsArea != null ? Mathf.Max(1f, _slotsArea.rect.width) : 1080f;
+        float areaHeight = _slotsArea != null ? Mathf.Max(1f, _slotsArea.rect.height) : 1280f;
+        Vector2 size = count > 1 ? new Vector2(248f, 184f) : new Vector2(276f, 198f);
+        size *= slotScale;
+        size.x = Mathf.Clamp(size.x, 128f, Mathf.Max(128f, areaWidth * 0.34f));
+        size.y = Mathf.Clamp(size.y, 98f, Mathf.Max(98f, areaHeight * 0.23f));
         float left = count > 1 ? 0.34f : 0.5f;
         float right = count > 1 ? 0.66f : 0.5f;
+        float methodY = Mathf.Lerp(0.72f, 0.78f, slotScale) + clusterYOffset;
         for (int i = 0; i < count; i++)
         {
             float x = count <= 1 ? 0.5f : Mathf.Lerp(left, right, i / (float)(count - 1));
-            string label = count == 1 ? "Methode" : "Methode " + (i + 1);
-            _slotsByKind[InGameCardKind.Method].Add(CreateSlot(_slotsArea, "MethodSlot_" + i, new Vector2(x, 0.77f), size, InGameCardKind.Method, i, label));
+            string label = count == 1 ? "Méthode" : "Méthode " + (i + 1);
+            _slotsByKind[InGameCardKind.Method].Add(CreateSlot(_slotsArea, "MethodSlot_" + i, new Vector2(x, methodY), size, InGameCardKind.Method, i, label));
         }
     }
 
     private void BuildSubstanceSlots(int count)
     {
-        Vector2 sharedSize = new Vector2(248f, 210f);
+        float slotScale = GetSlotsScale();
+        const float clusterYOffset = -0.08f;
+        float areaWidth = _slotsArea != null ? Mathf.Max(1f, _slotsArea.rect.width) : 1080f;
+        float areaHeight = _slotsArea != null ? Mathf.Max(1f, _slotsArea.rect.height) : 1280f;
+        Vector2 sharedSize = new Vector2(248f, 210f) * slotScale;
+        sharedSize.x = Mathf.Clamp(sharedSize.x, 120f, Mathf.Max(120f, areaWidth * 0.30f));
+        sharedSize.y = Mathf.Clamp(sharedSize.y, 98f, Mathf.Max(98f, areaHeight * 0.20f));
+        float subTopY = Mathf.Lerp(0.50f, 0.55f, slotScale) + clusterYOffset;
+        float subBottomY = Mathf.Lerp(0.30f, 0.35f, slotScale) + clusterYOffset;
 
         if (count <= 1)
         {
-            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_0", new Vector2(0.50f, 0.53f), sharedSize, InGameCardKind.Substance, 0, "Substance 1"));
+            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_0", new Vector2(0.50f, subTopY), sharedSize, InGameCardKind.Substance, 0, "Substance 1"));
             return;
         }
 
         if (count == 2)
         {
-            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_0", new Vector2(0.33f, 0.53f), sharedSize, InGameCardKind.Substance, 0, "Substance 1"));
-            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_1", new Vector2(0.67f, 0.53f), sharedSize, InGameCardKind.Substance, 1, "Substance 2"));
+            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_0", new Vector2(0.33f, subTopY), sharedSize, InGameCardKind.Substance, 0, "Substance 1"));
+            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_1", new Vector2(0.67f, subTopY), sharedSize, InGameCardKind.Substance, 1, "Substance 2"));
             return;
         }
 
         if (count == 3)
         {
-            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_0", new Vector2(0.33f, 0.53f), sharedSize, InGameCardKind.Substance, 0, "Substance 1"));
-            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_1", new Vector2(0.67f, 0.53f), sharedSize, InGameCardKind.Substance, 1, "Substance 2"));
-            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_2", new Vector2(0.50f, 0.32f), sharedSize, InGameCardKind.Substance, 2, "Substance 3"));
+            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_0", new Vector2(0.33f, subTopY), sharedSize, InGameCardKind.Substance, 0, "Substance 1"));
+            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_1", new Vector2(0.67f, subTopY), sharedSize, InGameCardKind.Substance, 1, "Substance 2"));
+            _slotsByKind[InGameCardKind.Substance].Add(CreateSlot(_slotsArea, "SubSlot_2", new Vector2(0.50f, subBottomY), sharedSize, InGameCardKind.Substance, 2, "Substance 3"));
             return;
         }
 
         int columns = Mathf.Clamp(Mathf.Min(3, count), 1, 3);
-        float startY = 0.54f;
-        float rowStep = 0.20f;
-        Vector2 size = new Vector2(236f, 198f);
+        float startY = Mathf.Lerp(0.52f, 0.56f, slotScale) + clusterYOffset;
+        float rowStep = Mathf.Lerp(0.16f, 0.18f, slotScale);
+        Vector2 size = new Vector2(236f, 198f) * slotScale;
+        size.x = Mathf.Clamp(size.x, 114f, Mathf.Max(114f, areaWidth * 0.28f));
+        size.y = Mathf.Clamp(size.y, 94f, Mathf.Max(94f, areaHeight * 0.18f));
         for (int i = 0; i < count; i++)
         {
             int row = i / columns;
@@ -895,16 +1045,25 @@ public class InGameRuntimeController : MonoBehaviour
 
     private void BuildHseSlots(int count)
     {
+        float slotScale = GetSlotsScale();
+        const float hseYOffset = -0.08f;
+        float areaWidth = _slotsArea != null ? Mathf.Max(1f, _slotsArea.rect.width) : 1080f;
+        float areaHeight = _slotsArea != null ? Mathf.Max(1f, _slotsArea.rect.height) : 1280f;
+        Vector2 size = new Vector2(224f, 188f) * slotScale;
+        size.x = Mathf.Clamp(size.x, 92f, Mathf.Max(92f, areaWidth * 0.18f));
+        size.y = Mathf.Clamp(size.y, 84f, Mathf.Max(84f, areaHeight * 0.16f));
+        float hseY = Mathf.Lerp(0.24f, 0.32f, slotScale) + hseYOffset;
+
         if (count == 1)
         {
-            _slotsByKind[InGameCardKind.Hse].Add(CreateSlot(_slotsArea, "HseSlot_0", new Vector2(0.88f, 0.56f), new Vector2(224f, 188f), InGameCardKind.Hse, 0, "HSE 1"));
+            _slotsByKind[InGameCardKind.Hse].Add(CreateSlot(_slotsArea, "HseSlot_0", new Vector2(0.76f, hseY), size, InGameCardKind.Hse, 0, "HSE 1"));
             return;
         }
 
         if (count == 2)
         {
-            _slotsByKind[InGameCardKind.Hse].Add(CreateSlot(_slotsArea, "HseSlot_0", new Vector2(0.10f, 0.56f), new Vector2(224f, 188f), InGameCardKind.Hse, 0, "HSE 1"));
-            _slotsByKind[InGameCardKind.Hse].Add(CreateSlot(_slotsArea, "HseSlot_1", new Vector2(0.90f, 0.56f), new Vector2(224f, 188f), InGameCardKind.Hse, 1, "HSE 2"));
+            _slotsByKind[InGameCardKind.Hse].Add(CreateSlot(_slotsArea, "HseSlot_0", new Vector2(0.24f, hseY), size, InGameCardKind.Hse, 0, "HSE 1"));
+            _slotsByKind[InGameCardKind.Hse].Add(CreateSlot(_slotsArea, "HseSlot_1", new Vector2(0.76f, hseY), size, InGameCardKind.Hse, 1, "HSE 2"));
             return;
         }
 
@@ -912,9 +1071,9 @@ public class InGameRuntimeController : MonoBehaviour
         {
             int row = i / 2;
             int col = i % 2;
-            float x = col == 0 ? 0.10f : 0.90f;
-            float y = 0.66f - (row * 0.18f);
-            _slotsByKind[InGameCardKind.Hse].Add(CreateSlot(_slotsArea, "HseSlot_" + i, new Vector2(x, y), new Vector2(224f, 188f), InGameCardKind.Hse, i, "HSE " + (i + 1)));
+            float x = col == 0 ? 0.24f : 0.76f;
+            float y = (Mathf.Lerp(0.33f, 0.41f, slotScale) + hseYOffset) - (row * Mathf.Lerp(0.12f, 0.15f, slotScale));
+            _slotsByKind[InGameCardKind.Hse].Add(CreateSlot(_slotsArea, "HseSlot_" + i, new Vector2(x, y), size, InGameCardKind.Hse, i, "HSE " + (i + 1)));
         }
     }
 
@@ -937,13 +1096,24 @@ public class InGameRuntimeController : MonoBehaviour
         StringBuilder body = new StringBuilder();
         string introBrief = FirstNonEmpty(_step.introBrief, _step.stepBrief, _level.levelBrief, _level.objective);
         string introObjective = FirstNonEmpty(_step.introObjective, _level.objective);
-        string introHseFocus = FirstNonEmpty(_step.introHseFocus, _level.hseFocus);
+        string introHseFocus = BuildIntroHseFocusText();
 
-        body.AppendLine(introBrief);
+        body.AppendLine("<b><size=34>Mission</size></b>");
+        body.AppendLine(EscapeRichText(string.IsNullOrWhiteSpace(introBrief) ? "Analyse la situation et prépare un montage cohérent." : introBrief));
         body.AppendLine();
-        body.AppendLine("Objectif: " + (string.IsNullOrWhiteSpace(introObjective) ? "A definir." : introObjective));
+
+        body.AppendLine("<b><size=32>Objectif</size></b>");
+        body.AppendLine(EscapeRichText(string.IsNullOrWhiteSpace(introObjective) ? "À définir." : introObjective));
+
         if (!string.IsNullOrWhiteSpace(introHseFocus))
-            body.AppendLine("Focus HSE: " + introHseFocus);
+        {
+            body.AppendLine();
+            body.AppendLine("<b><size=32>Focus HSE</size></b>");
+            body.AppendLine(EscapeRichText(introHseFocus));
+        }
+
+        body.AppendLine();
+        body.AppendLine("<i>Valide le briefing puis lance la phase de jeu.</i>");
 
         _introBody.text = body.ToString().Trim();
         _introPanel.gameObject.SetActive(true);
@@ -965,7 +1135,7 @@ public class InGameRuntimeController : MonoBehaviour
 
     private void UpdatePhaseUi()
     {
-        _stepTitleText.text = string.IsNullOrWhiteSpace(_step.stepTitle) ? ("Etape " + (_stepIndex + 1)) : _step.stepTitle;
+        _stepTitleText.text = string.IsNullOrWhiteSpace(_step.stepTitle) ? ("Étape " + (_stepIndex + 1)) : _step.stepTitle;
         Text validateLabel = _validateButton != null ? _validateButton.GetComponentInChildren<Text>() : null;
         switch (_phase)
         {
@@ -1321,18 +1491,44 @@ public class InGameRuntimeController : MonoBehaviour
     private int EvaluateSelectionMistakes(InGameCardKind kind, string[] requiredIds, string[] trapIds)
     {
         List<string> placed = GetPlacedIds(kind);
+        HashSet<string> placedSet = new HashSet<string>(placed);
         HashSet<string> required = new HashSet<string>(requiredIds ?? Array.Empty<string>());
         HashSet<string> traps = new HashSet<string>(trapIds ?? Array.Empty<string>());
+        Dictionary<string, string> trapMessages = BuildTrapMessageLookup(kind);
 
-        int trapHits = 0;
-        int extras = 0;
+        int errors = 0;
         foreach (string id in placed)
         {
-            if (traps.Contains(id)) trapHits++;
-            if (!required.Contains(id)) extras++;
+            if (string.IsNullOrWhiteSpace(id))
+                continue;
+
+            if (traps.Contains(id))
+            {
+                errors++;
+                string custom = trapMessages.ContainsKey(id) ? trapMessages[id] : string.Empty;
+                string prefix = "[Pi\u00E8ge - " + GetKindLabel(kind) + "] " + GetCardLabel(kind, id) + " : ";
+                _mistakeLines.Add(prefix + (string.IsNullOrWhiteSpace(custom) ? "ce choix est inadapt\u00E9 pour cette \u00E9tape." : custom));
+                continue;
+            }
+
+            if (!required.Contains(id))
+            {
+                errors++;
+                _mistakeLines.Add("[Carte en trop - " + GetKindLabel(kind) + "] " + GetCardLabel(kind, id));
+            }
         }
-        int missing = required.Count(id => !placed.Contains(id));
-        return Mathf.Max(0, trapHits + extras + missing);
+
+        foreach (string requiredId in required)
+        {
+            if (string.IsNullOrWhiteSpace(requiredId))
+                continue;
+            if (placedSet.Contains(requiredId))
+                continue;
+            errors++;
+            _mistakeLines.Add("[Carte manquante - " + GetKindLabel(kind) + "] " + GetCardLabel(kind, requiredId));
+        }
+
+        return Mathf.Max(0, errors);
     }
 
     private void LockCardsOfKind(InGameCardKind kind)
@@ -1373,20 +1569,58 @@ public class InGameRuntimeController : MonoBehaviour
     private void FinishLevel()
     {
         _timerRunning = false;
-        int stars = ComputeStars(_elapsedSeconds, _errorCount, _level.timeTargetSeconds <= 0 ? 180 : _level.timeTargetSeconds);
+        int stars = ComputeStars(_elapsedSeconds, _errorCount);
         PlayerProfileStore.RecordLevelResult(Mathf.Max(1, _level.levelIndex), _level.id, stars, _elapsedSeconds, _errorCount);
 
         _gamePanel.gameObject.SetActive(false);
         _resultPanel.gameObject.SetActive(true);
-        _resultTitle.text = "Resultat du niveau";
-        RenderStarCluster(_resultStarsRoot, _starSprite, stars, 58f);
-        _resultBody.text = "Temps: <b>" + BuildTimerText(_elapsedSeconds) + "</b>\nErreurs: <b>" + _errorCount + "</b>\n\nCible: <b>" + (_level.targetProductName ?? "Produit") + "</b>";
+        string levelLabel = string.IsNullOrWhiteSpace(_level.title) ? ("Niveau " + Mathf.Max(1, _level.levelIndex)) : _level.title.Trim();
+        _resultTitle.text = "Résultat - " + levelLabel;
+        RenderStarCluster(_resultStarsRoot, _starSprite, stars, 62f);
+        _resultBody.text = "Temps : <b>" + BuildTimerText(_elapsedSeconds) + "</b>   /   Erreurs : <b>" + _errorCount + "</b>\nCible : <b>" + (_level.targetProductName ?? "Produit") + "</b>";
+
+        if (_resultMistakesTitle != null)
+            _resultMistakesTitle.text = "Résumé des erreurs (" + _mistakeLines.Count + ")";
+        if (_resultMistakesBody != null)
+        {
+            _resultMistakesBody.text = BuildMistakeSummaryText();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_resultMistakesBody.rectTransform);
+            float preferred = Mathf.Max(120f, _resultMistakesBody.preferredHeight + 16f);
+            RectTransform textRt = _resultMistakesBody.rectTransform;
+            textRt.sizeDelta = new Vector2(textRt.sizeDelta.x, preferred);
+            RectTransform contentRt = textRt.parent as RectTransform;
+            if (contentRt != null)
+                contentRt.sizeDelta = new Vector2(contentRt.sizeDelta.x, preferred);
+        }
+        if (_resultMistakesScroll != null)
+            _resultMistakesScroll.verticalNormalizedPosition = 1f;
     }
 
-    private static int ComputeStars(float elapsedSeconds, int errors, int timeTarget)
+    private static int ComputeStars(float elapsedSeconds, int errors)
     {
-        if (errors > 0) return 1;
-        return elapsedSeconds < 60f ? 3 : 2;
+        int stars = 0;
+        if (elapsedSeconds < 60f)
+            stars += 1;
+        if (errors <= 0)
+            stars += 2;
+        return Mathf.Clamp(stars, 0, 3);
+    }
+
+    private string BuildMistakeSummaryText()
+    {
+        if (_mistakeLines == null || _mistakeLines.Count == 0)
+            return "<b><size=30>Parfait ! Zéro erreur.</size></b>\nMontage validé du premier coup.";
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < _mistakeLines.Count; i++)
+        {
+            string line = _mistakeLines[i];
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+            sb.Append(i + 1).Append(". ").AppendLine(line.Trim());
+        }
+        string value = sb.ToString().Trim();
+        return string.IsNullOrWhiteSpace(value) ? "Aucune erreur d\u00E9tect\u00E9e." : value;
     }
 
     private static void RenderStarCluster(RectTransform root, Sprite starSprite, int stars, float size)
@@ -1483,6 +1717,111 @@ public class InGameRuntimeController : MonoBehaviour
         }
     }
 
+    private string BuildIntroHseFocusText()
+    {
+        string focus = FirstNonEmpty(_step.introHseFocus, _level.hseFocus);
+        if (string.IsNullOrWhiteSpace(focus))
+            return string.Empty;
+
+        if (!ContainsExpectedHseHint(focus))
+            return focus;
+
+        return "Analyse les dangers de l'étape et choisis les pictogrammes HSE les plus pertinents, sans te laisser piéger.";
+    }
+
+    private bool ContainsExpectedHseHint(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return false;
+
+        string[] expectedHse = GetExpectedIds(InGameCardKind.Hse);
+        if (expectedHse == null || expectedHse.Length == 0)
+            return false;
+
+        for (int i = 0; i < expectedHse.Length; i++)
+        {
+            string id = expectedHse[i];
+            if (string.IsNullOrWhiteSpace(id))
+                continue;
+
+            string normalizedId = id.Trim();
+            if (ContainsIgnoreCase(text, normalizedId))
+                return true;
+
+            InGameHseData data = LoadJson<InGameHseData>("HSEs", normalizedId);
+            if (data == null)
+                continue;
+
+            if (ContainsIgnoreCase(text, data.title) || ContainsIgnoreCase(text, data.subtitle))
+                return true;
+        }
+
+        return false;
+    }
+
+    private Dictionary<string, string> BuildTrapMessageLookup(InGameCardKind kind)
+    {
+        InGameTrapErrorData[] entries = kind == InGameCardKind.Substance ? _step.trapSubstanceErrors :
+            (kind == InGameCardKind.Method ? _step.trapMethodErrors : _step.trapHseErrors);
+
+        Dictionary<string, string> lookup = new Dictionary<string, string>();
+        if (entries == null)
+            return lookup;
+
+        foreach (InGameTrapErrorData entry in entries)
+        {
+            if (entry == null || string.IsNullOrWhiteSpace(entry.cardId))
+                continue;
+
+            string cardId = entry.cardId.Trim();
+            if (lookup.ContainsKey(cardId))
+                continue;
+
+            lookup[cardId] = string.IsNullOrWhiteSpace(entry.message) ? string.Empty : entry.message.Trim();
+        }
+
+        return lookup;
+    }
+
+    private string GetKindLabel(InGameCardKind kind)
+    {
+        switch (kind)
+        {
+            case InGameCardKind.Substance: return "Substance";
+            case InGameCardKind.Method: return "M\u00E9thode";
+            case InGameCardKind.Hse: return "HSE";
+            default: return "Carte";
+        }
+    }
+
+    private string GetCardLabel(InGameCardKind kind, string cardId)
+    {
+        if (string.IsNullOrWhiteSpace(cardId))
+            return "Carte inconnue";
+
+        string id = cardId.Trim();
+        if (kind == InGameCardKind.Substance)
+        {
+            InGameSubstanceData data = LoadJson<InGameSubstanceData>("Substances", id);
+            if (data != null && !string.IsNullOrWhiteSpace(data.displayName))
+                return data.displayName.Trim();
+        }
+        else if (kind == InGameCardKind.Method)
+        {
+            InGameMethodData data = LoadJson<InGameMethodData>("Methods", id);
+            if (data != null && !string.IsNullOrWhiteSpace(data.title))
+                return data.title.Trim();
+        }
+        else
+        {
+            InGameHseData data = LoadJson<InGameHseData>("HSEs", id);
+            if (data != null && !string.IsNullOrWhiteSpace(data.title))
+                return data.title.Trim();
+        }
+
+        return id;
+    }
+
     private int GetSlotCount(InGameCardKind kind)
     {
         int configured = kind == InGameCardKind.Substance ? _step.substanceSlotCount :
@@ -1504,7 +1843,7 @@ public class InGameRuntimeController : MonoBehaviour
         if (phase == InGamePhase.SubstanceSelection)
             return FirstNonEmpty(_step.substancePhaseInstruction, "Phase 1: place " + GetSlotCount(InGameCardKind.Substance) + " substance(s)");
         if (phase == InGamePhase.MethodSelection)
-            return FirstNonEmpty(_step.methodPhaseInstruction, "Phase 2: place " + GetSlotCount(InGameCardKind.Method) + " methode(s)");
+            return FirstNonEmpty(_step.methodPhaseInstruction, "Phase 2: place " + GetSlotCount(InGameCardKind.Method) + " méthode(s)");
         if (phase == InGamePhase.HseSelection)
             return FirstNonEmpty(_step.hsePhaseInstruction, "Phase 3: place " + GetSlotCount(InGameCardKind.Hse) + " carte(s) HSE");
         return string.Empty;
@@ -1533,6 +1872,23 @@ public class InGameRuntimeController : MonoBehaviour
         foreach (string candidate in candidates)
             if (!string.IsNullOrWhiteSpace(candidate)) return candidate.Trim();
         return string.Empty;
+    }
+
+    private static string EscapeRichText(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return string.Empty;
+        return value
+            .Replace("&", "&amp;")
+            .Replace("<", "&lt;")
+            .Replace(">", "&gt;");
+    }
+
+    private static bool ContainsIgnoreCase(string text, string pattern)
+    {
+        if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(pattern))
+            return false;
+        return text.IndexOf(pattern.Trim(), StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     private static InGameCardKind GetPhaseKind(InGamePhase phase)
@@ -1664,6 +2020,21 @@ public class InGameRuntimeController : MonoBehaviour
         return list.Distinct();
     }
 
+    private System.Collections.IEnumerator RefreshResponsiveLayoutNextFrame()
+    {
+        yield return null;
+        if (_slotsArea == null || _level == null || _level.steps == null || _level.steps.Length == 0)
+            yield break;
+
+        Vector2 size = _slotsArea.rect.size;
+        if (size.x <= 1f || size.y <= 1f)
+            yield break;
+
+        _lastSlotsAreaSize = size;
+        RebuildSlotsForStep();
+        UpdatePhaseUi();
+    }
+
     private static string BuildTimerText(float seconds)
     {
         TimeSpan span = TimeSpan.FromSeconds(seconds);
@@ -1767,3 +2138,4 @@ public class InGameRuntimeController : MonoBehaviour
         Stretch(text.rectTransform, 60f, 60f, 60f, 60f);
     }
 }
+

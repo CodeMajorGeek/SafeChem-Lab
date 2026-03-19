@@ -40,6 +40,9 @@ public class HomeSubstancesPanel : MonoBehaviour
     private static readonly Dictionary<string, Sprite> TextureMapCache = new Dictionary<string, Sprite>();
 
     private RectTransform _root;
+    private RectTransform _gridViewport;
+    private RectTransform _gridContent;
+    private GridLayoutGroup _gridLayout;
     private Image _previewImage;
     private Text _previewTitle;
     private Text _previewFormula;
@@ -51,6 +54,7 @@ public class HomeSubstancesPanel : MonoBehaviour
     private Text _modalBody;
 
     private int _selectedIndex = -1;
+    private float _lastGridViewportWidth = -1f;
 
     private void Start()
     {
@@ -66,6 +70,11 @@ public class HomeSubstancesPanel : MonoBehaviour
             RuntimeFileLogger.Error("HomeSubstancesPanel", "Start failed: " + exception);
             Debug.LogException(exception, this);
         }
+    }
+
+    private void LateUpdate()
+    {
+        RefreshGridLayout();
     }
 
     private void LoadCards()
@@ -246,7 +255,7 @@ public class HomeSubstancesPanel : MonoBehaviour
             le.preferredHeight = 120f;
             Image emptyBg = EnsureImage(emptyRt);
             emptyBg.color = new Color(0.15f, 0.2f, 0.3f, 0.92f);
-            Text emptyText = EnsureText(emptyRt, "Text", 20, FontStyle.Bold, "Aucune substance chargee");
+            Text emptyText = EnsureText(emptyRt, "Text", 20, FontStyle.Bold, "Aucune substance chargée");
             emptyText.alignment = TextAnchor.MiddleCenter;
             RectTransform rt = emptyText.rectTransform;
             rt.anchorMin = Vector2.zero;
@@ -281,8 +290,8 @@ public class HomeSubstancesPanel : MonoBehaviour
             border.SetAsFirstSibling();
 
             RectTransform imageRt = EnsureRect(card, "Image");
-            imageRt.anchorMin = new Vector2(0.05f, 0.3f);
-            imageRt.anchorMax = new Vector2(0.95f, 0.96f);
+            imageRt.anchorMin = new Vector2(0.12f, 0.40f);
+            imageRt.anchorMax = new Vector2(0.88f, 0.90f);
             imageRt.pivot = new Vector2(0.5f, 0.5f);
             imageRt.anchoredPosition = Vector2.zero;
             imageRt.sizeDelta = Vector2.zero;
@@ -303,8 +312,8 @@ public class HomeSubstancesPanel : MonoBehaviour
             }
 
             RectTransform labelBandRt = EnsureRect(card, "LabelBand");
-            labelBandRt.anchorMin = new Vector2(0.04f, 0.04f);
-            labelBandRt.anchorMax = new Vector2(0.96f, 0.32f);
+            labelBandRt.anchorMin = new Vector2(0.04f, 0.05f);
+            labelBandRt.anchorMax = new Vector2(0.96f, 0.34f);
             labelBandRt.pivot = new Vector2(0.5f, 0f);
             labelBandRt.anchoredPosition = Vector2.zero;
             labelBandRt.sizeDelta = Vector2.zero;
@@ -319,8 +328,8 @@ public class HomeSubstancesPanel : MonoBehaviour
             nameText.resizeTextMinSize = 12;
             nameText.resizeTextMaxSize = 16;
             RectTransform nameRt = nameText.rectTransform;
-            nameRt.anchorMin = new Vector2(0.03f, 0.42f);
-            nameRt.anchorMax = new Vector2(0.97f, 0.95f);
+            nameRt.anchorMin = new Vector2(0.06f, 0.50f);
+            nameRt.anchorMax = new Vector2(0.94f, 0.92f);
             nameRt.pivot = new Vector2(0.5f, 0.5f);
             nameRt.anchoredPosition = Vector2.zero;
             nameRt.sizeDelta = Vector2.zero;
@@ -329,12 +338,18 @@ public class HomeSubstancesPanel : MonoBehaviour
             formulaText.alignment = TextAnchor.MiddleCenter;
             formulaText.color = new Color(0.8f, 0.9f, 1f, 1f);
             RectTransform formulaRt = formulaText.rectTransform;
-            formulaRt.anchorMin = new Vector2(0.03f, 0.06f);
-            formulaRt.anchorMax = new Vector2(0.97f, 0.4f);
+            formulaRt.anchorMin = new Vector2(0.06f, 0.10f);
+            formulaRt.anchorMax = new Vector2(0.94f, 0.46f);
             formulaRt.pivot = new Vector2(0.5f, 0.5f);
             formulaRt.anchoredPosition = Vector2.zero;
             formulaRt.sizeDelta = Vector2.zero;
         }
+
+        _gridViewport = viewport;
+        _gridContent = content;
+        _gridLayout = grid;
+        _lastGridViewportWidth = -1f;
+        RefreshGridLayout(force: true);
     }
 
     private void BuildModalOverlay()
@@ -567,11 +582,11 @@ public class HomeSubstancesPanel : MonoBehaviour
     private static string BuildSubstanceBody(SubstanceCardData data)
     {
         StringBuilder builder = new StringBuilder();
-        AppendSection(builder, "Resume", data.shortDescription);
+        AppendSection(builder, "Résumé", data.shortDescription);
         AppendSection(builder, "Risques / HSE", data.hazardSummary);
         AppendSection(builder, "Manipulation", data.handlingNotes);
         if (data.tags != null && data.tags.Length > 0)
-            AppendSection(builder, "Mots-cles", string.Join(", ", data.tags));
+            AppendSection(builder, "Mots-clés", string.Join(", ", data.tags));
         return builder.ToString().Trim();
     }
 
@@ -972,8 +987,26 @@ public class HomeSubstancesPanel : MonoBehaviour
             grid.padding = new RectOffset(left, right, 6, 6);
         }
 
-        float cellHeight = Mathf.Round(cellWidth * 1.06f);
+        float cellHeight = Mathf.Round(cellWidth * 0.98f);
         return new Vector2(cellWidth, cellHeight);
+    }
+
+    private void RefreshGridLayout(bool force = false)
+    {
+        if (_gridViewport == null || _gridContent == null || _gridLayout == null)
+            return;
+
+        float width = _gridViewport.rect.width;
+        if (width <= 1f)
+            return;
+
+        if (!force && Mathf.Abs(width - _lastGridViewportWidth) < 0.5f)
+            return;
+
+        _lastGridViewportWidth = width;
+        _gridLayout.cellSize = CalculateCardCellSize(_gridViewport, _gridLayout);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_gridContent);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_gridViewport);
     }
 
     private static RectTransform EnsureRect(Transform parent, string name)

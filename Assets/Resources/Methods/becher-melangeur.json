@@ -1,10 +1,10 @@
 {
   "id": "becher-melangeur",
-  "title": "Bécher + mélangeur",
+  "title": "B\u00e9cher + m\u00e9langeur",
   "subtitle": "Mise en solution",
-  "shortDescription": "Mélange de réactifs en bécher avec agitation pour homogénéiser et accélérer la dissolution.",
-  "detailedDescription": "Introduire les réactifs dans le bécher, placer sur agitateur, ajuster la vitesse puis contrôler la dissolution, l'homogénéité et la température du mélange.",
-  "safetyNotes": "Porter lunettes et gants, éviter projections et sur-remplissage, maintenir le bécher stable sur l'agitateur.",
+  "shortDescription": "M\u00e9lange de r\u00e9actifs en b\u00e9cher avec agitation pour homog\u00e9n\u00e9iser et acc\u00e9l\u00e9rer la dissolution.",
+  "detailedDescription": "Introduire les r\u00e9actifs dans le b\u00e9cher, placer sur agitateur, ajuster la vitesse puis contr\u00f4ler la dissolution, l'homog\u00e9n\u00e9it\u00e9 et la temp\u00e9rature du m\u00e9lange.",
+  "safetyNotes": "Porter lunettes et gants, \u00e9viter projections et sur-remplissage, maintenir le b\u00e9cher stable sur l'agitateur.",
   "atlasTextureResource": "Methods/verrie-1",
   "atlasX": 0,
   "atlasY": 0,
@@ -12,8 +12,8 @@
   "atlasHeight": 300,
   "imageResource": "Methods/verrie-1",
   "tags": [
-    "mélange",
+    "m\u00e9lange",
     "agitation",
-    "bécher"
+    "b\u00e9cher"
   ]
 }

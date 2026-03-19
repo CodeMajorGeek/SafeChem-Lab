@@ -4,7 +4,7 @@
   "title": "Niveau 1",
   "summary": "Synth\u00e8se guid\u00e9e d'ac\u00e9tate d'\u00e9thyl \u00e0 partir d'acide ac\u00e9tique et d'\u00e9thanol.",
   "objective": "R\u00e9aliser la synth\u00e8se d'ac\u00e9tate d'\u00e9thyl \u00e0 partir d'acide ac\u00e9tique, d'\u00e9thanol et de H2SO4, en \u00e9vitant le faux r\u00e9actif HCl.",
-  "hseFocus": "Identifier les risques corrosif, inflammable et toxique avant validation du montage.",
+  "hseFocus": "Analyser les dangers du montage et valider les pictogrammes HSE pertinents avant la manipulation.",
   "sceneName": "InGame",
   "levelBrief": "Synth\u00e8se d'ac\u00e9tate d'\u00e9thyl \u00e0 partir d'acide ac\u00e9tique, d'\u00e9thanol et de H2SO4.",
   "targetProductId": "acetate-ethyl",
@@ -36,7 +36,7 @@
       "stepBrief": "Place les bonnes cartes dans les slots, puis valide chaque phase.",
       "introBrief": "Tu vas r\u00e9aliser une est\u00e9rification de Fischer pour produire l'ac\u00e9tate d'\u00e9thyl.",
       "introObjective": "Assembler les bons r\u00e9actifs, choisir la bonne m\u00e9thode, puis s\u00e9lectionner les cartes HSE adapt\u00e9es.",
-      "introHseFocus": "\u00c9vite les pi\u00e8ges et s\u00e9curise la manipulation avant validation.",
+      "introHseFocus": "Rep\u00e8re les risques de l'\u00e9tape et s\u00e9curise la manipulation sans te laisser pi\u00e9ger.",
       "substanceSlotCount": 3,
       "methodSlotCount": 1,
       "hseSlotCount": 2,
@@ -83,6 +83,28 @@
       ],
       "trapHseIds": [
         "toxique"
+      ],
+      "trapSubstanceErrors": [
+        {
+          "cardId": "hcl",
+          "message": "En estérification de Fischer, HCl aqueux apporte de l'eau et n'a pas le pouvoir déshydratant de H2SO4 concentré. L'équilibre vers l'ester est donc moins favorable."
+        }
+      ],
+      "trapMethodErrors": [
+        {
+          "cardId": "becher-melangeur",
+          "message": "Le simple mélange au bécher ne suffit pas pour isoler proprement l'ester cible dans ce scénario."
+        },
+        {
+          "cardId": "reflux-froid",
+          "message": "Le reflux peut accélérer la réaction, mais ici l'étape attendue est l'isolement du produit par distillation."
+        }
+      ],
+      "trapHseErrors": [
+        {
+          "cardId": "toxique",
+          "message": "Le pictogramme toxique n'est pas le risque principal ici. Les priorités de cette étape sont surtout corrosif et inflammable."
+        }
       ]
     }
   ]

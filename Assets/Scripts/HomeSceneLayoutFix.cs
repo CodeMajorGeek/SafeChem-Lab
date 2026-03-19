@@ -40,7 +40,7 @@ public class HomeSceneLayoutFix : MonoBehaviour
     [SerializeField] private float splashFadeInDuration = 0.4f;
     [SerializeField] private float splashHoldDuration = 2.2f;
     [SerializeField] private float splashFadeOutDuration = 0.4f;
-    [SerializeField] private int levelCount = 6;
+    [SerializeField] private int levelCount = 5;
     [SerializeField] private string inGameSceneName = "InGame";
     [SerializeField] private string rightSubPageIcon1 = "icon_chemicals.png";
     [SerializeField] private string rightSubPageIcon2 = "icon_methods.png";
@@ -212,6 +212,8 @@ public class HomeSceneLayoutFix : MonoBehaviour
 
         if (_scroll.content != null)
             LayoutRebuilder.ForceRebuildLayoutImmediate(_scroll.content);
+
+        Canvas.ForceUpdateCanvases();
 
         if (_pagerSnap != null)
             _pagerSnap.JumpToPage(_pagerSnap.CurrentPage);
@@ -791,37 +793,45 @@ public class HomeSceneLayoutFix : MonoBehaviour
         map.anchorMin = Vector2.zero;
         map.anchorMax = Vector2.one;
         map.offsetMin = new Vector2(0, 210);
-        map.offsetMax = new Vector2(0, -8);
+        map.offsetMax = new Vector2(0, -42);
         ClearChildren(map);
         VerticalLayoutGroup v = map.GetComponent<VerticalLayoutGroup>();
         if (v == null) v = map.gameObject.AddComponent<VerticalLayoutGroup>();
-        v.spacing = 8;
-        v.padding = new RectOffset(0, 0, 8, 8);
+        float mapWidth = Mathf.Max(320f, map.rect.width);
+        float rowHeight = Mathf.Clamp((_progressBody.rect.height - 240f) / Mathf.Max(1, _levels.Count), 220f, 300f);
+        v.spacing = Mathf.Clamp(rowHeight * 0.12f, 16f, 30f);
+        v.padding = new RectOffset(0, 0, 44, 18);
         v.childAlignment = TextAnchor.UpperCenter;
         v.childControlWidth = true;
         v.childControlHeight = true;
         v.childForceExpandWidth = true;
-        v.childForceExpandHeight = true;
+        v.childForceExpandHeight = false;
 
         for (int i = 0; i < _levels.Count; i++)
         {
             LevelDefinitionData level = _levels[i];
-            bool unlocked = i == 0 || GetLevelStars(_levels[i - 1].levelIndex) >= 1;
+            bool comingSoon = IsComingSoonLevel(level.levelIndex);
+            bool unlocked = !comingSoon && (i == 0 || GetLevelStars(_levels[i - 1].levelIndex) >= 1);
 
             RectTransform row = EnsureRect(map, "LevelRow_" + level.levelIndex);
             LayoutElement le = row.GetComponent<LayoutElement>();
             if (le == null) le = row.gameObject.AddComponent<LayoutElement>();
-            le.preferredHeight = 148;
+            le.preferredHeight = rowHeight;
+            le.minHeight = rowHeight;
+            le.flexibleHeight = 0f;
 
             RectTransform btnRt = EnsureRect(row, "BtnLevel");
             btnRt.anchorMin = btnRt.anchorMax = new Vector2(0.5f, 0f);
             btnRt.pivot = new Vector2(0.5f, 0f);
-            btnRt.anchoredPosition = new Vector2(0f, 50f);
-            btnRt.sizeDelta = new Vector2(208, 104);
+            float buttonWidth = Mathf.Clamp(mapWidth * 0.39f, 248f, 352f);
+            float buttonHeight = Mathf.Round(buttonWidth * 0.52f);
+            float buttonY = Mathf.Clamp(rowHeight * 0.19f, 32f, 62f);
+            btnRt.anchoredPosition = new Vector2(0f, buttonY);
+            btnRt.sizeDelta = new Vector2(buttonWidth, buttonHeight);
             Image bi = EnsureImage(btnRt);
             bi.sprite = lvl;
             bi.preserveAspect = true;
-            bi.color = unlocked ? Color.white : new Color(0.35f, 0.35f, 0.35f, 0.95f);
+            bi.color = unlocked ? Color.white : (comingSoon ? new Color(0.30f, 0.30f, 0.30f, 0.90f) : new Color(0.35f, 0.35f, 0.35f, 0.95f));
 
             Button b = EnsureButton(btnRt);
             b.targetGraphic = bi;
@@ -833,8 +843,10 @@ public class HomeSceneLayoutFix : MonoBehaviour
                 b.onClick.AddListener(() => SelectLevel(_levels[idx]));
             }
 
-            Text cap = EnsureNamedLabel(row, "LevelCaption", "Niveau " + level.levelIndex, 30, FontStyle.Bold);
+            string captionValue = comingSoon ? ("Niveau " + level.levelIndex + " - Prochainement") : ("Niveau " + level.levelIndex);
+            Text cap = EnsureNamedLabel(row, "LevelCaption", captionValue, 30, FontStyle.Bold);
             cap.alignment = TextAnchor.MiddleCenter;
+            cap.fontSize = comingSoon ? 24 : 30;
             cap.color = unlocked ? Color.white : new Color(0.75f, 0.75f, 0.75f, 1f);
             cap.horizontalOverflow = HorizontalWrapMode.Overflow;
             cap.verticalOverflow = VerticalWrapMode.Overflow;
@@ -842,19 +854,24 @@ public class HomeSceneLayoutFix : MonoBehaviour
             crt.anchorMin = new Vector2(0.5f, 0f);
             crt.anchorMax = new Vector2(0.5f, 0f);
             crt.pivot = new Vector2(0.5f, 0f);
-            crt.anchoredPosition = new Vector2(0f, 4f);
-            crt.sizeDelta = new Vector2(360f, 40f);
+            crt.anchoredPosition = new Vector2(0f, 8f);
+            crt.sizeDelta = new Vector2(Mathf.Clamp(mapWidth * 0.66f, 320f, 520f), 44f);
+            Outline capOutline = cap.GetComponent<Outline>();
+            if (capOutline == null) capOutline = cap.gameObject.AddComponent<Outline>();
+            capOutline.effectColor = new Color(0f, 0f, 0f, 0.72f);
+            capOutline.effectDistance = new Vector2(1f, -1f);
 
-            int stars = GetLevelStars(level.levelIndex);
+            int stars = comingSoon ? 0 : GetLevelStars(level.levelIndex);
             RectTransform starsRt = EnsureRect(row, "StarsCluster");
             starsRt.anchorMin = new Vector2(0.5f, 0f);
             starsRt.anchorMax = new Vector2(0.5f, 0f);
             starsRt.pivot = new Vector2(0.5f, 0f);
-            starsRt.anchoredPosition = new Vector2(0f, 136f);
-            starsRt.sizeDelta = new Vector2(220f, 96f);
-            RenderStarCluster(starsRt, starSprite, stars, 36f);
+            starsRt.anchoredPosition = new Vector2(0f, buttonY + (buttonHeight * 0.76f) + 18f);
+            starsRt.sizeDelta = new Vector2(230f, 108f);
+            RenderStarCluster(starsRt, starSprite, stars, 38f);
 
-            Text lockText = EnsureNamedLabel(btnRt, "LockBadge", unlocked ? string.Empty : "Verrouillé", 20, FontStyle.Bold);
+            string badge = (unlocked || comingSoon) ? string.Empty : "Verrouillé";
+            Text lockText = EnsureNamedLabel(btnRt, "LockBadge", badge, 20, FontStyle.Bold);
             lockText.alignment = TextAnchor.MiddleCenter;
             lockText.color = new Color(0.78f, 0.78f, 0.78f, 1f);
             RectTransform lockRt = lockText.rectTransform;
@@ -862,6 +879,7 @@ public class HomeSceneLayoutFix : MonoBehaviour
             lockRt.anchorMax = Vector2.one;
             lockRt.offsetMin = Vector2.zero;
             lockRt.offsetMax = Vector2.zero;
+            lockText.gameObject.SetActive(!string.IsNullOrWhiteSpace(badge));
         }
 
         BuildLevelDrawer();
@@ -936,6 +954,8 @@ public class HomeSceneLayoutFix : MonoBehaviour
     {
         if (level == null)
             return;
+        if (IsComingSoonLevel(level.levelIndex))
+            return;
 
         PlayerPrefs.SetInt(SelectedLevelKey, level.levelIndex);
         PlayerPrefs.SetString(SelectedLevelIdKey, string.IsNullOrWhiteSpace(level.id) ? ("level-" + level.levelIndex) : level.id);
@@ -972,6 +992,11 @@ public class HomeSceneLayoutFix : MonoBehaviour
         }
 
         SetLevelDrawerVisible(true);
+    }
+
+    private static bool IsComingSoonLevel(int levelIndex)
+    {
+        return levelIndex == 3 || levelIndex == 4 || levelIndex == 5;
     }
 
     private void SetLevelDrawerVisible(bool visible)
@@ -1316,14 +1341,33 @@ public class HomeSceneLayoutFix : MonoBehaviour
     private IEnumerator ShowSplash()
     {
         Sprite s = LoadSprite("Backgrounds/bg-loading"); if (s == null) yield break;
+
+        RectTransform sharedHeader = _canvasRt != null ? (_canvasRt.Find("Header") as RectTransform) : null;
+        RectTransform sharedFooter = _canvasRt != null ? (_canvasRt.Find("Footer") as RectTransform) : null;
+        bool headerWasActive = sharedHeader != null && sharedHeader.gameObject.activeSelf;
+        bool footerWasActive = sharedFooter != null && sharedFooter.gameObject.activeSelf;
+        if (sharedHeader != null) sharedHeader.gameObject.SetActive(false);
+        if (sharedFooter != null) sharedFooter.gameObject.SetActive(false);
+
         RectTransform rt = EnsureRect(_canvasRt, "SplashOverlay");
         rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero; rt.SetAsLastSibling();
+        Canvas splashCanvas = rt.GetComponent<Canvas>();
+        if (splashCanvas == null) splashCanvas = rt.gameObject.AddComponent<Canvas>();
+        splashCanvas.overrideSorting = true;
+        splashCanvas.sortingOrder = 5000;
+        if (rt.GetComponent<GraphicRaycaster>() == null) rt.gameObject.AddComponent<GraphicRaycaster>();
+
         Image img = EnsureImage(rt); img.sprite = s; img.preserveAspect = false; img.raycastTarget = true; img.color = new Color(1, 1, 1, 0);
 
         float t = 0; while (t < splashFadeInDuration) { t += Time.unscaledDeltaTime; Color c = img.color; c.a = Mathf.Clamp01(t / splashFadeInDuration); img.color = c; yield return null; }
         if (splashHoldDuration > 0) yield return new WaitForSecondsRealtime(splashHoldDuration);
         t = 0; while (t < splashFadeOutDuration) { t += Time.unscaledDeltaTime; Color c = img.color; c.a = 1f - Mathf.Clamp01(t / splashFadeOutDuration); img.color = c; yield return null; }
         Destroy(rt.gameObject);
+
+        if (sharedHeader != null) sharedHeader.gameObject.SetActive(headerWasActive);
+        if (sharedFooter != null) sharedFooter.gameObject.SetActive(footerWasActive);
+        NormalizeSharedSceneChrome();
+        NormalizeBodiesForOverlay();
     }
 
     private static RectTransform EnsureRect(Transform parent, string name)

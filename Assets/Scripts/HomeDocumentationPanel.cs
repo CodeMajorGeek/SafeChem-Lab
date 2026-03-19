@@ -160,7 +160,7 @@ public class HomeDocumentationPanel : MonoBehaviour
             emptyRt.sizeDelta = new Vector2(0f, 120f);
             Image emptyBg = EnsureImage(emptyRt);
             emptyBg.color = cardColor;
-            Text emptyText = EnsureText(emptyRt, "Text", 18, FontStyle.Normal, "Aucune fiche chargee.\nAjoute des JSON dans Resources/" + resourcesFolder + ".");
+            Text emptyText = EnsureText(emptyRt, "Text", 18, FontStyle.Normal, "Aucune fiche chargée.\nAjoute des JSON dans Resources/" + resourcesFolder + ".");
             emptyText.alignment = TextAnchor.MiddleCenter;
             Stretch(emptyText.rectTransform, 18f, 18f, 18f, 18f);
             return;
@@ -398,7 +398,7 @@ public class HomeDocumentationPanel : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(entry.shortDescription))
         {
-            builder.Append("## Resume");
+            builder.Append("## Résumé");
             builder.Append("\n");
             builder.Append(entry.shortDescription.Trim());
             builder.Append("\n\n");

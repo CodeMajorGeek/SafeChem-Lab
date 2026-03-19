@@ -10,7 +10,7 @@
   "atlasColumns": 4,
   "atlasCellWidth": 78,
   "atlasCellHeight": 114,
-  "moléculeImageResource": "Icons/icon_chemicals",
+  "moleculeImageResource": "Icons/icon_chemicals",
   "cardImageResource": "Icons/icon_chemicals",
   "tags": [
     "acide",

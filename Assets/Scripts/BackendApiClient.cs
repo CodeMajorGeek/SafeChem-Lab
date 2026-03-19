@@ -7,7 +7,7 @@ using UnityEngine;
 
 public static class BackendApiClient
 {
-    private const string ApiBaseUrl = "http://127.0.0.1:8000";
+    private const string ApiBaseUrl = "http://91.160.87.34:18000";
     private const string GameAppId = "safechem-unity-client";
     private const string PublicKeyResourcePath = "Security/game_public_key";
 

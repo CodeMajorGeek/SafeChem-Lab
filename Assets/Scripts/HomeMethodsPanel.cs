@@ -33,13 +33,20 @@ public class HomeMethodsPanel : MonoBehaviour
     private readonly List<MethodCardData> _methods = new List<MethodCardData>();
     private readonly List<Button> _cardButtons = new List<Button>();
     private static readonly Dictionary<string, Sprite> TextureRectCache = new Dictionary<string, Sprite>();
+    private static readonly Dictionary<string, Sprite> TrimmedSpriteCache = new Dictionary<string, Sprite>();
 
     private RectTransform _root;
+    private RectTransform _gridViewport;
+    private RectTransform _gridContent;
+    private GridLayoutGroup _gridLayout;
     private RectTransform _modalOverlay;
     private Text _modalTitle;
     private Image _modalImage;
     private Text _modalBody;
     private int _selectedIndex = -1;
+    private bool IsHseCatalog => !string.IsNullOrWhiteSpace(resourcesFolder) &&
+        resourcesFolder.IndexOf("hse", StringComparison.OrdinalIgnoreCase) >= 0;
+    private float _lastGridViewportWidth = -1f;
 
     public void Configure(string folder, string overlayObjectName = null)
     {
@@ -63,6 +70,11 @@ public class HomeMethodsPanel : MonoBehaviour
             RuntimeFileLogger.Error("HomeMethodsPanel", "Start failed: " + exception);
             Debug.LogException(exception, this);
         }
+    }
+
+    private void LateUpdate()
+    {
+        RefreshGridLayout();
     }
 
     private void LoadMethods()
@@ -187,7 +199,7 @@ public class HomeMethodsPanel : MonoBehaviour
             le.preferredHeight = 120f;
             Image emptyBg = EnsureImage(emptyRt);
             emptyBg.color = new Color(0.15f, 0.2f, 0.3f, 0.92f);
-            Text emptyText = EnsureText(emptyRt, "Text", 20, FontStyle.Bold, "Aucune methode chargee");
+            Text emptyText = EnsureText(emptyRt, "Text", 20, FontStyle.Bold, "Aucune méthode chargée");
             emptyText.alignment = TextAnchor.MiddleCenter;
             RectTransform rt = emptyText.rectTransform;
             rt.anchorMin = Vector2.zero;
@@ -222,15 +234,23 @@ public class HomeMethodsPanel : MonoBehaviour
             border.SetAsFirstSibling();
 
             RectTransform imageRt = EnsureRect(card, "Image");
-            imageRt.anchorMin = new Vector2(0.05f, 0.3f);
-            imageRt.anchorMax = new Vector2(0.95f, 0.96f);
+            if (IsHseCatalog)
+            {
+                imageRt.anchorMin = new Vector2(0.17f, 0.36f);
+                imageRt.anchorMax = new Vector2(0.83f, 0.90f);
+            }
+            else
+            {
+                imageRt.anchorMin = new Vector2(0.10f, 0.34f);
+                imageRt.anchorMax = new Vector2(0.90f, 0.90f);
+            }
             imageRt.pivot = new Vector2(0.5f, 0.5f);
             imageRt.anchoredPosition = Vector2.zero;
             imageRt.sizeDelta = Vector2.zero;
             Image img = EnsureImage(imageRt);
             img.preserveAspect = true;
             img.raycastTarget = false;
-            Sprite sprite = ResolveSprite(data);
+            Sprite sprite = TrimTransparentPadding(ResolveSprite(data));
             if (sprite != null)
             {
                 img.sprite = sprite;
@@ -243,8 +263,8 @@ public class HomeMethodsPanel : MonoBehaviour
             }
 
             RectTransform labelBandRt = EnsureRect(card, "LabelBand");
-            labelBandRt.anchorMin = new Vector2(0.04f, 0.04f);
-            labelBandRt.anchorMax = new Vector2(0.96f, 0.32f);
+            labelBandRt.anchorMin = new Vector2(0.04f, 0.05f);
+            labelBandRt.anchorMax = new Vector2(0.96f, 0.28f);
             labelBandRt.pivot = new Vector2(0.5f, 0f);
             labelBandRt.anchoredPosition = Vector2.zero;
             labelBandRt.sizeDelta = Vector2.zero;
@@ -259,8 +279,8 @@ public class HomeMethodsPanel : MonoBehaviour
             title.resizeTextMinSize = 12;
             title.resizeTextMaxSize = 16;
             RectTransform titleRt = title.rectTransform;
-            titleRt.anchorMin = new Vector2(0.03f, 0.42f);
-            titleRt.anchorMax = new Vector2(0.97f, 0.95f);
+            titleRt.anchorMin = new Vector2(0.06f, 0.50f);
+            titleRt.anchorMax = new Vector2(0.94f, 0.92f);
             titleRt.pivot = new Vector2(0.5f, 0.5f);
             titleRt.anchoredPosition = Vector2.zero;
             titleRt.sizeDelta = Vector2.zero;
@@ -269,12 +289,18 @@ public class HomeMethodsPanel : MonoBehaviour
             subtitle.alignment = TextAnchor.MiddleCenter;
             subtitle.color = new Color(0.8f, 0.9f, 1f, 1f);
             RectTransform subRt = subtitle.rectTransform;
-            subRt.anchorMin = new Vector2(0.03f, 0.06f);
-            subRt.anchorMax = new Vector2(0.97f, 0.4f);
+            subRt.anchorMin = new Vector2(0.06f, 0.10f);
+            subRt.anchorMax = new Vector2(0.94f, 0.46f);
             subRt.pivot = new Vector2(0.5f, 0.5f);
             subRt.anchoredPosition = Vector2.zero;
             subRt.sizeDelta = Vector2.zero;
         }
+
+        _gridViewport = viewport;
+        _gridContent = content;
+        _gridLayout = grid;
+        _lastGridViewportWidth = -1f;
+        RefreshGridLayout(force: true);
     }
 
     private void BuildModalOverlay()
@@ -426,7 +452,7 @@ public class HomeMethodsPanel : MonoBehaviour
 
         if (_modalImage != null)
         {
-            Sprite sprite = ResolveSprite(method);
+            Sprite sprite = TrimTransparentPadding(ResolveSprite(method));
             if (sprite != null)
             {
                 _modalImage.sprite = sprite;
@@ -465,11 +491,11 @@ public class HomeMethodsPanel : MonoBehaviour
     private static string BuildMethodBody(MethodCardData data)
     {
         StringBuilder builder = new StringBuilder();
-        AppendSection(builder, "Resume", data.shortDescription);
-        AppendSection(builder, "Procedure", data.detailedDescription);
-        AppendSection(builder, "Securite", data.safetyNotes);
+        AppendSection(builder, "Résumé", data.shortDescription);
+        AppendSection(builder, "Procédure", data.detailedDescription);
+        AppendSection(builder, "Sécurité", data.safetyNotes);
         if (data.tags != null && data.tags.Length > 0)
-            AppendSection(builder, "Mots-cles", string.Join(", ", data.tags));
+            AppendSection(builder, "Mots-clés", string.Join(", ", data.tags));
         return builder.ToString().Trim();
     }
 
@@ -630,6 +656,80 @@ public class HomeMethodsPanel : MonoBehaviour
         return null;
     }
 
+    private static Sprite TrimTransparentPadding(Sprite source)
+    {
+        if (source == null || source.texture == null)
+            return source;
+
+        Rect rect = source.rect;
+        int x = Mathf.RoundToInt(rect.x);
+        int y = Mathf.RoundToInt(rect.y);
+        int w = Mathf.RoundToInt(rect.width);
+        int h = Mathf.RoundToInt(rect.height);
+        if (w <= 2 || h <= 2)
+            return source;
+
+        string cacheKey = source.texture.GetInstanceID() + "|" + x + "|" + y + "|" + w + "|" + h;
+        Sprite cached;
+        if (TrimmedSpriteCache.TryGetValue(cacheKey, out cached) && cached != null)
+            return cached;
+
+        try
+        {
+            Color[] pixels = source.texture.GetPixels(x, y, w, h);
+            int minX = w;
+            int minY = h;
+            int maxX = -1;
+            int maxY = -1;
+            const float alphaThreshold = 0.02f;
+
+            for (int py = 0; py < h; py++)
+            {
+                int row = py * w;
+                for (int px = 0; px < w; px++)
+                {
+                    if (pixels[row + px].a <= alphaThreshold)
+                        continue;
+
+                    if (px < minX) minX = px;
+                    if (px > maxX) maxX = px;
+                    if (py < minY) minY = py;
+                    if (py > maxY) maxY = py;
+                }
+            }
+
+            if (maxX < minX || maxY < minY)
+            {
+                TrimmedSpriteCache[cacheKey] = source;
+                return source;
+            }
+
+            int trimW = maxX - minX + 1;
+            int trimH = maxY - minY + 1;
+            if (trimW >= w && trimH >= h)
+            {
+                TrimmedSpriteCache[cacheKey] = source;
+                return source;
+            }
+
+            Rect trimmedRect = new Rect(x + minX, y + minY, trimW, trimH);
+            Sprite trimmed = Sprite.Create(source.texture, trimmedRect, new Vector2(0.5f, 0.5f), source.pixelsPerUnit);
+            if (trimmed == null)
+            {
+                TrimmedSpriteCache[cacheKey] = source;
+                return source;
+            }
+
+            TrimmedSpriteCache[cacheKey] = trimmed;
+            return trimmed;
+        }
+        catch
+        {
+            TrimmedSpriteCache[cacheKey] = source;
+            return source;
+        }
+    }
+
     private static Sprite LoadSpriteSmart(string resourcePath)
     {
         if (string.IsNullOrWhiteSpace(resourcePath))
@@ -707,8 +807,26 @@ public class HomeMethodsPanel : MonoBehaviour
             grid.padding = new RectOffset(left, right, 6, 6);
         }
 
-        float cellHeight = Mathf.Round(cellWidth * 1.06f);
+        float cellHeight = Mathf.Round(cellWidth * 1.02f);
         return new Vector2(cellWidth, cellHeight);
+    }
+
+    private void RefreshGridLayout(bool force = false)
+    {
+        if (_gridViewport == null || _gridContent == null || _gridLayout == null)
+            return;
+
+        float width = _gridViewport.rect.width;
+        if (width <= 1f)
+            return;
+
+        if (!force && Mathf.Abs(width - _lastGridViewportWidth) < 0.5f)
+            return;
+
+        _lastGridViewportWidth = width;
+        _gridLayout.cellSize = CalculateCardCellSize(_gridViewport, _gridLayout);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_gridContent);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_gridViewport);
     }
 
     private static RectTransform EnsureRect(Transform parent, string name)

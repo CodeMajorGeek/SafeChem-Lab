@@ -4,7 +4,7 @@
   "title": "Niveau X",
   "summary": "R\\u00e9sum\\u00e9 court du niveau",
   "objective": "Objectif global du niveau",
-  "hseFocus": "Focus HSE du niveau",
+  "hseFocus": "Focus HSE du niveau (sans r\u00e9v\u00e9ler les cartes attendues)",
   "sceneName": "InGame",
   "levelBrief": "Brief d'introduction affich\\u00e9 dans la modale d'entr\\u00e9e.",
   "timeTargetSeconds": 180,
@@ -30,7 +30,7 @@
       "stepBrief": "Consigne de l'\\u00e9tape",
       "introBrief": "Texte d'intro de l'\\u00e9tape (ou du niveau)",
       "introObjective": "Objectif affich\\u00e9 dans la modale",
-      "introHseFocus": "Focus HSE affich\\u00e9 dans la modale",
+      "introHseFocus": "Focus HSE affich\\u00e9 dans la modale (texte non-spoil)",
       "substanceSlotCount": 3,
       "methodSlotCount": 1,
       "hseSlotCount": 2,
@@ -75,6 +75,24 @@
       ],
       "trapHseIds": [
         "hse-piege"
+      ],
+      "trapSubstanceErrors": [
+        {
+          "cardId": "substance-piege",
+          "message": "Pourquoi cette substance est un piège dans ce niveau."
+        }
+      ],
+      "trapMethodErrors": [
+        {
+          "cardId": "methode-piege",
+          "message": "Pourquoi cette méthode est un piège dans ce niveau."
+        }
+      ],
+      "trapHseErrors": [
+        {
+          "cardId": "hse-piege",
+          "message": "Pourquoi ce pictogramme HSE est un piège dans ce niveau."
+        }
       ]
     }
   ]

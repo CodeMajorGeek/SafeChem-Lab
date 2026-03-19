@@ -104,8 +104,6 @@ public class HomePagerSnap : MonoBehaviour, IBeginDragHandler, IEndDragHandler
         if (!this || scrollRect == null) yield break;
 
         float start = scrollRect.horizontalNormalizedPosition;
-        float startContentX = scrollRect.content != null ? scrollRect.content.anchoredPosition.x : 0f;
-        float targetContentX = GetContentTargetX(pageIndex);
         float t = 0f;
 
         while (t < duration)
@@ -116,12 +114,6 @@ public class HomePagerSnap : MonoBehaviour, IBeginDragHandler, IEndDragHandler
             float x = Mathf.Clamp01(t / duration);
             float k = EaseInOutCubic(x);
             scrollRect.horizontalNormalizedPosition = Mathf.Lerp(start, target, k);
-            if (scrollRect.content != null)
-            {
-                Vector2 pos = scrollRect.content.anchoredPosition;
-                pos.x = Mathf.Lerp(startContentX, targetContentX, k);
-                scrollRect.content.anchoredPosition = pos;
-            }
             yield return null;
         }
 
@@ -139,21 +131,6 @@ public class HomePagerSnap : MonoBehaviour, IBeginDragHandler, IEndDragHandler
     private void ApplyPagePosition(int pageIndex, float normalizedTarget)
     {
         scrollRect.horizontalNormalizedPosition = normalizedTarget;
-        if (scrollRect.content != null)
-        {
-            Vector2 pos = scrollRect.content.anchoredPosition;
-            pos.x = GetContentTargetX(pageIndex);
-            scrollRect.content.anchoredPosition = pos;
-        }
-    }
-
-    private float GetContentTargetX(int pageIndex)
-    {
-        if (scrollRect == null || scrollRect.viewport == null)
-            return 0f;
-
-        float pageWidth = scrollRect.viewport.rect.width;
-        return -pageIndex * pageWidth;
     }
 
     private static float EaseInOutCubic(float t)

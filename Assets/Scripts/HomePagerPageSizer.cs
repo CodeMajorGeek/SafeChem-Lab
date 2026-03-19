@@ -7,33 +7,64 @@ public class HomePagerPageSizer : MonoBehaviour
     [SerializeField] private RectTransform viewport;
     [SerializeField] private RectTransform content;
     [SerializeField] private RectTransform[] pages;
+    [SerializeField] private bool autoDiscoverPages = true;
+
+    private Vector2 _lastViewportSize = new Vector2(-1f, -1f);
 
     private void OnEnable() => Apply();
     private void OnRectTransformDimensionsChange() => Apply();
+
+    private void LateUpdate()
+    {
+        ResolveReferences();
+        if (viewport == null)
+            return;
+
+        Vector2 size = viewport.rect.size;
+        if (size.x <= 0f || size.y <= 0f)
+            return;
+        if (Mathf.Abs(size.x - _lastViewportSize.x) < 0.5f && Mathf.Abs(size.y - _lastViewportSize.y) < 0.5f)
+            return;
+
+        Apply();
+    }
 
     [ContextMenu("Apply")]
     public void Apply()
     {
         ResolveReferences();
-        if (!viewport || pages == null) return;
+        if (viewport == null || pages == null)
+            return;
 
         Vector2 size = viewport.rect.size;
-        if (size.x <= 0f || size.y <= 0f) return;
+        if (size.x <= 0f || size.y <= 0f)
+            return;
+        _lastViewportSize = size;
 
         int activePageCount = 0;
-        foreach (var p in pages)
+        for (int i = 0; i < pages.Length; i++)
         {
-            if (!p) continue;
+            RectTransform page = pages[i];
+            if (page == null)
+                continue;
+
             activePageCount++;
-            p.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x);
-            p.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
+            page.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x);
+            page.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
+
+            LayoutElement pageLayout = page.GetComponent<LayoutElement>();
+            if (pageLayout == null)
+                pageLayout = page.gameObject.AddComponent<LayoutElement>();
+            pageLayout.minWidth = size.x;
+            pageLayout.preferredWidth = size.x;
+            pageLayout.flexibleWidth = 0f;
+            pageLayout.minHeight = size.y;
+            pageLayout.preferredHeight = size.y;
+            pageLayout.flexibleHeight = 0f;
         }
 
-        if (content)
+        if (content != null)
         {
-            int count = Mathf.Max(1, activePageCount);
-            content.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x * count);
-            content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
             LayoutRebuilder.ForceRebuildLayoutImmediate(content);
         }
     }
@@ -41,12 +72,19 @@ public class HomePagerPageSizer : MonoBehaviour
     private void ResolveReferences()
     {
         ScrollRect scroll = GetComponent<ScrollRect>();
-        if (!scroll) scroll = GetComponentInParent<ScrollRect>();
+        if (scroll == null)
+            scroll = GetComponentInParent<ScrollRect>();
 
-        if (!viewport && scroll)
+        if (viewport == null && scroll != null)
             viewport = scroll.viewport;
-
-        if (!content && scroll)
+        if (content == null && scroll != null)
             content = scroll.content;
+
+        if ((pages == null || pages.Length == 0) && autoDiscoverPages && content != null)
+        {
+            pages = new RectTransform[content.childCount];
+            for (int i = 0; i < content.childCount; i++)
+                pages[i] = content.GetChild(i) as RectTransform;
+        }
     }
 }

@@ -2,11 +2,11 @@
   "id": "level-2",
   "levelIndex": 2,
   "title": "Niveau 2",
-  "summary": "Synth\u00e8se d'acide nitrique sous contraintes de s\u00e9curit\u00e9.",
-  "objective": "Produire l'acide nitrique en s\u00e9lectionnant les bonnes cartes et les bons pictogrammes HSE.",
-  "hseFocus": "Manipulation corrosive et toxique : contr\u00f4ler la s\u00e9curit\u00e9 avant validation.",
+  "summary": "Synthèse d'acide nitrique sous contraintes de sécurité.",
+  "objective": "Produire l'acide nitrique en sélectionnant les bonnes cartes et les bons pictogrammes HSE.",
+  "hseFocus": "Identifier les principaux dangers de la manipulation et appliquer les bons pictogrammes HSE.",
   "sceneName": "InGame",
-  "levelBrief": "Objectif : obtenir l'acide nitrique sans erreur de s\u00e9lection.",
+  "levelBrief": "Objectif : obtenir l'acide nitrique sans erreur de sélection.",
   "targetProductId": "hno3",
   "targetProductName": "Acide nitrique",
   "timeTargetSeconds": 150,
@@ -32,19 +32,19 @@
   "steps": [
     {
       "stepId": "step-1",
-      "stepTitle": "\u00c9tape 1 - Acide nitrique",
-      "stepBrief": "S\u00e9lectionne les bons r\u00e9actifs, la bonne m\u00e9thode et les bons pictogrammes HSE.",
+      "stepTitle": "Étape 1 - Acide nitrique",
+      "stepBrief": "Sélectionne les bons réactifs, la bonne méthode et les bons pictogrammes HSE.",
       "introBrief": "Tu dois produire de l'acide nitrique en choisissant les bonnes cartes.",
-      "introObjective": "Choisir les bonnes cartes substances, puis le proc\u00e9d\u00e9 adapt\u00e9, puis les bonnes cartes HSE.",
-      "introHseFocus": "Valider les risques toxique et corrosif.",
+      "introObjective": "Choisir les bonnes cartes substances, puis le procédé adapté, puis les bonnes cartes HSE.",
+      "introHseFocus": "Analyse les risques de l'étape et choisis les pictogrammes HSE les plus adaptés.",
       "substanceSlotCount": 2,
       "methodSlotCount": 1,
       "hseSlotCount": 2,
       "substancePhaseInstruction": "Phase 1 : place H2SO4 et KNO3.",
-      "methodPhaseInstruction": "Phase 2 : place le proc\u00e9d\u00e9 distillation.",
+      "methodPhaseInstruction": "Phase 2 : place le procédé distillation.",
       "hsePhaseInstruction": "Phase 3 : place les cartes HSE toxique et corrosif.",
       "validateSubstanceLabel": "Valider substances",
-      "validateMethodLabel": "Valider proc\u00e9d\u00e9",
+      "validateMethodLabel": "Valider procédé",
       "validateHseLabel": "Valider HSE",
       "displaySubstanceIds": [
         "h2so4",
@@ -83,6 +83,32 @@
       ],
       "trapHseIds": [
         "explosif"
+      ],
+      "trapSubstanceErrors": [
+        {
+          "cardId": "hcl",
+          "message": "HCl n'apporte aucun ion nitrate et n'est pas l'acide de déplacement adapté ici. Pour libérer HNO3 depuis KNO3, on utilise un milieu à base de H2SO4 concentré, peu volatil et déshydratant."
+        },
+        {
+          "cardId": "mgso4",
+          "message": "MgSO4 est un sel et ne fournit pas le nitrate nécessaire à la formation de HNO3. Il ne remplace pas le système KNO3 + H2SO4."
+        }
+      ],
+      "trapMethodErrors": [
+        {
+          "cardId": "becher-melangeur",
+          "message": "Un mélange direct au bécher ne permet pas d'isoler proprement l'acide nitrique formé. La séparation attendue ici est la distillation."
+        },
+        {
+          "cardId": "reflux-froid",
+          "message": "En reflux, les vapeurs sont condensées puis renvoyées dans le ballon. Ici, on doit récupérer le distillat, pas le renvoyer."
+        }
+      ],
+      "trapHseErrors": [
+        {
+          "cardId": "explosif",
+          "message": "Le pictogramme explosif n'est pas prioritaire pour ce montage. Les risques majeurs ici sont surtout corrosif et toxique."
+        }
       ]
     }
   ]

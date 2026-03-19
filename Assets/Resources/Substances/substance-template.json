@@ -10,7 +10,7 @@
   "atlasColumns": 4,
   "atlasCellWidth": 78,
   "atlasCellHeight": 114,
-  "moléculeImageResource": "Substances/fallback-molécule",
+  "moleculeImageResource": "Substances/fallback-molecule",
   "cardImageResource": "Substances/fallback-card",
   "tags": [
     "mot-clé-1",
