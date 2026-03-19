@@ -6,6 +6,10 @@ function initSlides() {
   const indexEl = document.getElementById("slideIndex");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
+  const timerEl = document.getElementById("timerValue");
+
+  let elapsedSeconds = 0;
+  let timerHandle = null;
 
   let current = 0;
   const max = slides.length - 1;
@@ -97,4 +101,17 @@ function initSlides() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initSlides();
+
+  const timerEl = document.getElementById("timerValue");
+  if (!timerEl) return;
+
+  let seconds = 0;
+  function tick() {
+    seconds += 1;
+    const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const secs = String(seconds % 60).padStart(2, "0");
+    timerEl.textContent = `${mins}:${secs}`;
+  }
+
+  setInterval(tick, 1000);
 });

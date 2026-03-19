@@ -12,144 +12,280 @@
 <body>
   <div class="bg-layer"></div>
 
+  <div class="timer-badge" aria-hidden="true">
+    <span class="timer-label">Durée</span>
+    <span id="timerValue">00:00</span>
+  </div>
+
   <main id="deck" class="deck" aria-live="polite">
     <section class="slide active" data-title="Couverture">
-      <div class="slide-shell">
-        <div class="hero-badge">Serious Game - Chimie &amp; Sécurité</div>
-        <h1>SafeChem Lab</h1>
-        <p class="lead">
-          Pitch projet.<br>
-          Prototype mobile Unity pour apprendre la chimie appliquée avec logique de mission, cartes interactives et réflexes HSE.
-        </p>
+      <div class="slide-shell hero-shell">
+        <div class="hero-grid">
+          <div>
+            <div class="hero-badge">Serious Game - Chimie et Sécurité</div>
+            <h1>SafeChem Lab</h1>
+            <p class="lead">
+              Un prototype mobile Unity qui transforme la chimie appliquée en entraînement interactif:
+              choix des réactifs, méthode expérimentale, vigilance HSE et feedback immédiat.
+            </p>
+            <div class="tag-row">
+              <span class="tag">Unity / C#</span>
+              <span class="tag">Data-driven JSON</span>
+              <span class="tag">Drag &amp; Drop pédagogique</span>
+              <span class="tag">Focus HSE</span>
+            </div>
+          </div>
+          <aside class="panel soft">
+            <h3>Promesse</h3>
+            <p>Apprendre la logique chimique sans risque réel, en gardant un format jeu motivant et concret.</p>
+            <h3>Public visé</h3>
+            <p>Apprenants chimie, formateurs, organismes de formation et écoles techniques.</p>
+          </aside>
+        </div>
       </div>
     </section>
 
     <section class="slide" data-title="Plan">
       <div class="slide-shell">
-        <h2>Plan du Pitch</h2>
-        <ol id="timeline" class="timeline">
-          <li><span>1. Introduction / Accroche</span></li>
-          <li><span>2. Problème &amp; Opportunité</span></li>
-          <li><span>3. Solution : SafeChem Lab</span></li>
-          <li><span>4. Cas d'usage &amp; Démo</span></li>
-          <li><span>5. Business Model</span></li>
-          <li><span>6. Marché &amp; Opportunités</span></li>
-          <li><span>7. Prochaines étapes &amp; CTA</span></li>
+        <h2>Plan de présentation</h2>
+        <ol class="timeline">
+          <li><span>1. Contexte et problème pédagogique</span></li>
+          <li><span>2. Solution produit: SafeChem Lab</span></li>
+          <li><span>3. Démo de l'expérience apprenant</span></li>
+          <li><span>4. Architecture technique et contenu data-driven</span></li>
+          <li><span>5. Valeur pédagogique et impact attendu</span></li>
+          <li><span>6. Business model et marché</span></li>
+          <li><span>7. Roadmap et appel à action</span></li>
         </ol>
       </div>
     </section>
 
-    <section class="slide" data-title="1. Introduction">
+    <section class="slide" data-title="Contexte">
       <div class="slide-shell">
         <div class="slide-head">
-          <h2>1. Introduction - Accroche</h2>
+          <h2>1. Contexte et problème</h2>
         </div>
-        <p class="hook">
-          "Et si on apprenait la chimie et la sécurité labo sans passer par l'erreur réelle ?"
-        </p>
-        <p>
-          SafeChem Lab transforme la révision théorique en entraînement interactif :
-          on réfléchit, on teste, on valide, puis on comprend ses erreurs.
+        <p class="hook">Question de départ: comment rendre la chimie plus active, plus mémorable et plus sûre à apprendre?</p>
+        <div class="split">
+          <article class="panel">
+            <h3>Ce qu'on observe</h3>
+            <ul>
+              <li>Apprentissage souvent théorique et peu manipulatoire.</li>
+              <li>Difficulté à relier protocole, sécurité et résultat final.</li>
+              <li>Peu de feedback sur les erreurs de raisonnement.</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <h3>Conséquence pédagogique</h3>
+            <ul>
+              <li>Mémorisation fragile sur les mécanismes réactionnels.</li>
+              <li>Réflexes HSE appris mais peu entraînés en contexte.</li>
+              <li>Manque d'autonomie dans l'analyse d'un montage.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Solution">
+      <div class="slide-shell">
+        <div class="slide-head">
+          <h2>2. Solution produit: SafeChem Lab</h2>
+        </div>
+        <div class="kpi-grid">
+          <article class="kpi-card">
+            <h3>Parcours clair</h3>
+            <p>Chaque niveau propose un objectif de synthèse, des cartes à sélectionner et des pièges à éviter.</p>
+          </article>
+          <article class="kpi-card">
+            <h3>Mécanique active</h3>
+            <p>Drag &amp; drop en 3 phases: substances, méthode, pictogrammes HSE.</p>
+          </article>
+          <article class="kpi-card">
+            <h3>Feedback utile</h3>
+            <p>Résumé des erreurs avec explication de chaque piège utilisé.</p>
+          </article>
+          <article class="kpi-card">
+            <h3>Motivation</h3>
+            <p>Score en étoiles (temps + précision) et progression visible niveau par niveau.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Démo">
+      <div class="slide-shell">
+        <div class="slide-head">
+          <h2>3. Démo d'un défi type</h2>
+        </div>
+        <div class="flow">
+          <div class="flow-step">
+            <h3>Étape A</h3>
+            <p>Lecture de mission: objectif réactionnel et contraintes.</p>
+          </div>
+          <div class="flow-step">
+            <h3>Étape B</h3>
+            <p>Sélection de substances dans les slots dédiés.</p>
+          </div>
+          <div class="flow-step">
+            <h3>Étape C</h3>
+            <p>Choix de la méthode expérimentale adaptée.</p>
+          </div>
+          <div class="flow-step">
+            <h3>Étape D</h3>
+            <p>Validation des cartes HSE puis résultat final.</p>
+          </div>
+        </div>
+        <p class="note">
+          Exemples actuels: estérification de Fischer et production d'acide nitrique avec cartes pièges contextualisées.
         </p>
       </div>
     </section>
 
-    <section class="slide" data-title="2. Problème">
+    <section class="slide" data-title="Architecture">
       <div class="slide-shell">
         <div class="slide-head">
-          <h2>2. Problème &amp; Opportunité</h2>
+          <h2>4. Architecture technique</h2>
         </div>
-        <ul>
-          <li>Les contenus de chimie sont souvent retenus de façon passive.</li>
-          <li>Les risques HSE sont appris sur papier, rarement mis en situation.</li>
-          <li>Les apprenants manquent de feedback concret sur leurs choix.</li>
+        <div class="split">
+          <article class="panel">
+            <h3>Côté Unity</h3>
+            <ul>
+              <li>UI générée au runtime pour refléter les données JSON (niveaux, cartes, docs).</li>
+              <li>Scène Home: pager 3 écrans + header/footer fixes + menu settings.</li>
+              <li>Scène InGame: contrôleur runtime avec phases, drag &amp; drop et score.</li>
+              <li>Profil local persistant: UUID, pseudo, progression, étoiles.</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <h3>Côté data et backend</h3>
+            <ul>
+              <li>Contenus pilotés par JSON: niveaux, docs, substances, méthodes, HSE.</li>
+              <li>Texture maps / atlas pour accélérer la production d'assets.</li>
+              <li>API REST Python pour synchroniser création joueur et résultats.</li>
+              <li>Stack backend: FastAPI + PostgreSQL + Adminer sous Docker.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Data-driven">
+      <div class="slide-shell">
+        <div class="slide-head">
+          <h2>5. Pourquoi le modèle data-driven est clé</h2>
+        </div>
+        <ul class="checklist">
+          <li>Ajouter un niveau revient à ajouter un JSON dans le dossier Levels.</li>
+          <li>Le JSON décrit: cartes affichées, cartes attendues, pièges, messages d'erreur, consignes.</li>
+          <li>Les fiches docs, substances, méthodes et HSE suivent la même logique.</li>
+          <li>Le gameplay est extensible sans refactor lourd du code C#.</li>
         </ul>
         <p>
-          Opportunité : proposer une progression par défis, avec mécaniques de jeu,
-          pour ancrer les mécanismes chimiques et les bons réflexes de sécurité.
+          Résultat: gain de vitesse pour itérer sur le contenu pédagogique, et meilleure autonomie côté design pédagogique.
         </p>
       </div>
     </section>
 
-    <section class="slide" data-title="3. Solution">
+    <section class="slide" data-title="Impact">
       <div class="slide-shell">
         <div class="slide-head">
-          <h2>3. Solution - SafeChem Lab</h2>
+          <h2>6. Valeur pédagogique attendue</h2>
+        </div>
+        <div class="kpi-grid">
+          <article class="kpi-card">
+            <h3>Engagement</h3>
+            <p>Le format mission + score augmente l'attention sur la durée.</p>
+          </article>
+          <article class="kpi-card">
+            <h3>Compréhension</h3>
+            <p>Les erreurs expliquées permettent un apprentissage par correction active.</p>
+          </article>
+          <article class="kpi-card">
+            <h3>Sécurité</h3>
+            <p>Les choix HSE sont entraînés en contexte, pas isolés sur fiche théorique.</p>
+          </article>
+          <article class="kpi-card">
+            <h3>Mesure</h3>
+            <p>Temps, erreurs, étoiles: indicateurs simples pour suivre la progression.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Business">
+      <div class="slide-shell">
+        <div class="slide-head">
+          <h2>7. Business model</h2>
+        </div>
+        <div class="split">
+          <article class="panel">
+            <h3>Offres envisagées</h3>
+            <ul>
+              <li>Licence établissement (lycées, CFA, écoles techniques).</li>
+              <li>Version entreprise pour onboarding sécurité/process.</li>
+              <li>Pack contenu spécifique métier (chimie fine, procédés, HSE).</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <h3>Monétisation</h3>
+            <ul>
+              <li>Abonnement annuel par groupe d'apprenants.</li>
+              <li>Option de personnalisation des niveaux et scénarios.</li>
+              <li>Module analytics pour formateurs / responsables pédagogiques.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Marché">
+      <div class="slide-shell">
+        <div class="slide-head">
+          <h2>8. Marché et différenciation</h2>
         </div>
         <ul>
-          <li>Niveaux scénarisés pilotés par JSON (objectifs, cartes attendues, pièges).</li>
-          <li>Gameplay drag &amp; drop : substances, méthode, pictogrammes HSE.</li>
-          <li>Feedback post-run avec erreurs détaillées et score en étoiles.</li>
-          <li>Bibliothèque intégrée : documentation chimie + cartes référence.</li>
-          <li>Structure extensible : ajouter un niveau = ajouter un JSON.</li>
+          <li>Besoin fort en formation immersive et professionnalisante.</li>
+          <li>Différenciation: combinaison chimie + gameplay + sécurité opérationnelle.</li>
+          <li>Positionnement pratique: pas juste "quiz", mais raisonnement de montage complet.</li>
+          <li>Potentiel d'extension vers d'autres domaines techniques à risques.</li>
         </ul>
+        <p class="note">
+          Le projet est pensé "contenu d'abord": la valeur augmente à mesure que le catalogue de défis grandit.
+        </p>
       </div>
     </section>
 
-    <section class="slide" data-title="4. Cas d'usage">
+    <section class="slide" data-title="Roadmap">
       <div class="slide-shell">
         <div class="slide-head">
-          <h2>4. Cas d'usage &amp; Démonstration</h2>
+          <h2>9. Roadmap d'exécution</h2>
         </div>
-        <p>
-          Défi type : produire un composé cible en sélectionnant les bons réactifs,
-          la bonne méthode et les bons pictogrammes HSE.
-        </p>
-        <ol>
-          <li>L'apprenant lit l'intro mission.</li>
-          <li>Il place les cartes substances puis valide.</li>
-          <li>Il choisit la méthode puis les cartes HSE.</li>
-          <li>Il reçoit un bilan : étoiles et erreurs expliquées.</li>
+        <ol class="timeline compact">
+          <li><span>Finaliser le prototype jouable end-to-end (stabilité mobile + contenus clés).</span></li>
+          <li><span>Lancer un pilote pédagogique sur un petit groupe cible.</span></li>
+          <li><span>Mesurer: taux de complétion, erreurs récurrentes, progression entre tentatives.</span></li>
+          <li><span>Industrialiser le pipeline contenu pour créer rapidement de nouveaux niveaux.</span></li>
+          <li><span>Préparer une version v1 orientée déploiement établissement.</span></li>
         </ol>
       </div>
     </section>
 
-    <section class="slide" data-title="5. Business Model">
-      <div class="slide-shell">
-        <div class="slide-head">
-          <h2>5. Business Model</h2>
-        </div>
-        <ul>
-          <li>Licence établissement (lycée, CFA, école, centre de formation).</li>
-          <li>Version entreprise pour onboarding sécurité et procédés.</li>
-          <li>Pack contenu premium : niveaux sectoriels personnalisés.</li>
-          <li>Module analytics pour suivre la progression des groupes.</li>
-        </ul>
-        <p class="note">Modèle cible : abonnement annuel + personnalisation.</p>
-      </div>
-    </section>
-
-    <section class="slide" data-title="6. Marché">
-      <div class="slide-shell">
-        <div class="slide-head">
-          <h2>6. Marché &amp; Opportunités</h2>
-        </div>
-        <ul>
-          <li>Hausse continue des besoins de formation digitale immersive.</li>
-          <li>Demande forte sur sécurité, conformité et pratique métier.</li>
-          <li>Positionnement hybride : pédagogie scientifique + jeu mobile.</li>
-        </ul>
-        <p>
-          Extension naturelle vers des catalogues multi-domaines :
-          chimie, HSE industrie, process opératoires, pré-certification.
-        </p>
-      </div>
-    </section>
-
-    <section class="slide" data-title="7. CTA">
+    <section class="slide" data-title="Conclusion">
       <div class="slide-shell slide-final">
         <div class="slide-head">
-          <h2>7. Prochaines étapes &amp; Appel à action</h2>
+          <h2>10. Conclusion et appel à action</h2>
         </div>
-        <ul>
-          <li>Finaliser le prototype : contenu niveaux + équilibrage UX mobile.</li>
-          <li>Tester avec un groupe pilote en conditions réelles.</li>
-          <li>Mesurer engagement, taux de réussite et progression.</li>
-        </ul>
         <p class="cta">
-          Objectif immédiat : valider l'impact pédagogique puis lancer un déploiement
-          progressif avec partenaires éducation / formation.
+          SafeChem Lab rend la chimie plus concrète, plus engageante et plus sûre à apprendre.
+          La base technique est en place, le modèle contenu est extensible,
+          et la prochaine étape est la validation terrain avec des apprenants réels.
         </p>
+        <div class="tag-row">
+          <span class="tag">Prototype opérationnel</span>
+          <span class="tag">Approche scalable</span>
+          <span class="tag">Impact pédagogique mesurable</span>
+        </div>
       </div>
     </section>
   </main>
@@ -158,7 +294,7 @@
     <button id="prevBtn" class="nav-btn" type="button">&larr;</button>
     <div class="deck-status">
       <span id="slideTitle">Couverture</span>
-      <span id="slideIndex">1 / 9</span>
+      <span id="slideIndex">1 / 12</span>
     </div>
     <button id="nextBtn" class="nav-btn" type="button">&rarr;</button>
   </div>
