@@ -35,7 +35,6 @@ sysinfo.txt
 *.stackdump
 [Tt]humbnails/
 [Ee]xport/
-*.apk
 *.aab
 *.unitypackage
 *.app
